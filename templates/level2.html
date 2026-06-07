@@ -1,0 +1,1654 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Level 2 - Phishing Pond</title>
+
+<style>
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    height: 100vh;
+    overflow: hidden;
+    font-family: "Segoe UI", Arial, sans-serif;
+    background:
+        radial-gradient(circle at top left, rgba(0,255,200,0.18), transparent 30%),
+        linear-gradient(135deg, #06151d, #073241, #021016);
+    color: #111;
+}
+
+/* INTRO */
+.intro {
+    position: fixed;
+    inset: 0;
+    background:
+        radial-gradient(circle, rgba(0,255,200,0.18), transparent 40%),
+        #031014;
+    color: white;
+    z-index: 400;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
+
+.intro-box {
+    max-width: 850px;
+    padding: 35px;
+}
+
+.intro h1 {
+    color: #00ffc8;
+    font-size: 42px;
+}
+
+.intro p {
+    line-height: 1.6;
+}
+
+.folder-guide {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+    margin: 25px 0;
+}
+
+.guide-card {
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(0,255,200,0.35);
+    border-radius: 15px;
+    padding: 15px;
+    text-align: left;
+}
+
+.guide-card h3 {
+    color: #00ffc8;
+    margin-top: 0;
+}
+
+.intro button {
+    background: #00ffc8;
+    color: #031014;
+    border: none;
+    padding: 15px 25px;
+    border-radius: 12px;
+    font-weight: bold;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+/* DESKTOP */
+.desktop {
+    height: 100vh;
+    position: relative;
+    padding: 25px;
+}
+
+.desktop-icon {
+    width: 95px;
+    text-align: center;
+    color: white;
+    margin-bottom: 25px;
+    cursor: pointer;
+    user-select: none;
+}
+
+.desktop-icon .icon-box {
+    width: 62px;
+    height: 62px;
+    margin: auto;
+    border-radius: 14px;
+    background: rgba(255,255,255,0.14);
+    border: 1px solid rgba(255,255,255,0.35);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 32px;
+    box-shadow: 0 0 18px rgba(0,255,200,0.25);
+}
+
+.desktop-icon span {
+    display: block;
+    margin-top: 7px;
+    font-size: 13px;
+    text-shadow: 0 2px 4px black;
+}
+
+.pulse {
+    animation: pulse 1.2s infinite;
+}
+
+@keyframes pulse {
+    0% { box-shadow: 0 0 0 0 rgba(0,255,200,0.6); }
+    70% { box-shadow: 0 0 0 18px rgba(0,255,200,0); }
+    100% { box-shadow: 0 0 0 0 rgba(0,255,200,0); }
+}
+
+/* TASKBAR */
+.taskbar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 48px;
+    background: rgba(5, 10, 15, 0.9);
+    border-top: 2px solid #00ffc8;
+    display: flex;
+    align-items: center;
+    padding: 0 14px;
+    color: white;
+    z-index: 50;
+}
+
+.start-btn {
+    background: #00ffc8;
+    color: #031014;
+    border: none;
+    padding: 9px 16px;
+    border-radius: 8px;
+    font-weight: bold;
+    margin-right: 15px;
+    cursor: pointer;
+}
+
+.task-app {
+    background: rgba(255,255,255,0.12);
+    padding: 8px 18px;
+    border-radius: 8px;
+    margin-right: 10px;
+    cursor: pointer;
+}
+
+.clock {
+    margin-left: auto;
+    font-weight: bold;
+}
+
+/* NOTIFICATION */
+.notification {
+    position: fixed;
+    right: 22px;
+    bottom: 70px;
+    width: 330px;
+    background: white;
+    color: #111;
+    border-radius: 14px;
+    box-shadow: 0 0 25px rgba(0,0,0,0.45);
+    padding: 18px;
+    transform: translateY(150%);
+    opacity: 0;
+    transition: 0.6s;
+    z-index: 100;
+    border-left: 7px solid #00ffc8;
+}
+
+.notification.show {
+    transform: translateY(0);
+    opacity: 1;
+}
+
+.notification h3 {
+    margin: 0 0 8px;
+    color: #06343c;
+}
+
+.notification button {
+    background: #00b894;
+    color: white;
+    border: none;
+    padding: 9px 14px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+/* APP WINDOW */
+.window {
+    position: absolute;
+    top: 55px;
+    left: 145px;
+    right: 45px;
+    bottom: 75px;
+    background: #f4f6f8;
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 0 35px rgba(0,0,0,0.55);
+    display: none;
+    border: 2px solid rgba(255,255,255,0.5);
+}
+
+.window.show {
+    display: grid;
+    grid-template-rows: 42px 1fr;
+    animation: openWindow 0.35s ease;
+}
+
+@keyframes openWindow {
+    from {
+        transform: scale(0.85);
+        opacity: 0;
+    }
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+.window-title {
+    background: #073241;
+    color: white;
+    display: flex;
+    align-items: center;
+    padding: 0 14px;
+    font-weight: bold;
+}
+
+.window-controls {
+    margin-left: auto;
+    display: flex;
+    gap: 8px;
+}
+
+.ctrl {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: #ff5f57;
+}
+
+.ctrl.yellow {
+    background: #ffbd2e;
+}
+
+.ctrl.green {
+    background: #28c840;
+}
+
+/* MAIL APP */
+.mail-layout {
+    display: grid;
+    grid-template-columns: 210px 330px 1fr 250px;
+    height: 100%;
+}
+
+.left-nav {
+    background: #e9edf0;
+    border-right: 1px solid #cdd4da;
+    padding: 15px;
+}
+
+.app-tabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 18px;
+}
+
+.app-tab {
+    flex: 1;
+    text-align: center;
+    background: white;
+    padding: 9px 5px;
+    border-radius: 8px;
+    font-size: 13px;
+    cursor: pointer;
+}
+
+.app-tab.active {
+    background: #073241;
+    color: white;
+}
+
+.folder {
+    padding: 12px;
+    border-radius: 9px;
+    margin-bottom: 8px;
+    cursor: pointer;
+}
+
+.folder.active {
+    background: #00ffc8;
+    font-weight: bold;
+}
+
+.folder small {
+    float: right;
+    background: #073241;
+    color: white;
+    padding: 2px 7px;
+    border-radius: 8px;
+}
+
+.email-list {
+    background: white;
+    border-right: 1px solid #cdd4da;
+    overflow-y: auto;
+}
+
+.toolbar {
+    height: 58px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px;
+    border-bottom: 1px solid #ddd;
+    background: #f8f9fb;
+}
+
+.tool-btn {
+    border: none;
+    border-radius: 9px;
+    padding: 9px 12px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.move-btn {
+    background: #dfe6e9;
+}
+
+.report-btn {
+    background: #ff4b6e;
+    color: white;
+}
+
+.email-item {
+    padding: 15px;
+    border-bottom: 1px solid #e6e6e6;
+    cursor: pointer;
+    position: relative;
+}
+
+.email-item.active {
+    background: #dffdf5;
+    border-left: 5px solid #00b894;
+}
+
+.email-item .from {
+    font-weight: bold;
+    color: #073241;
+}
+
+.email-item .subject {
+    margin-top: 4px;
+    font-size: 14px;
+}
+
+.email-item .preview {
+    color: #666;
+    font-size: 12px;
+    margin-top: 4px;
+}
+
+.unread-dot {
+    position: absolute;
+    right: 12px;
+    top: 18px;
+    width: 10px;
+    height: 10px;
+    background: #00b894;
+    border-radius: 50%;
+}
+
+/* READ PANE */
+.read-pane {
+    background: #fff;
+    padding: 22px;
+    overflow-y: auto;
+}
+
+.email-subject {
+    font-size: 25px;
+    font-weight: bold;
+    color: #073241;
+    margin-bottom: 12px;
+}
+
+.meta {
+    background: #f1f3f5;
+    border-radius: 10px;
+    padding: 12px;
+    margin-bottom: 15px;
+    font-size: 14px;
+}
+
+.email-body {
+    line-height: 1.7;
+    font-size: 16px;
+}
+
+.fake-link {
+    color: #0066cc;
+    text-decoration: underline;
+    cursor: pointer;
+    word-break: break-all;
+}
+
+.attachment {
+    margin-top: 16px;
+    padding: 12px;
+    background: #fff3cd;
+    border: 1px solid #ffda6a;
+    border-radius: 10px;
+    display: inline-block;
+}
+
+/* SIDE PANEL */
+.side-panel {
+    background: #f2f5f7;
+    border-left: 1px solid #cdd4da;
+    padding: 15px;
+    overflow-y: auto;
+}
+
+.status-card {
+    background: white;
+    border-radius: 12px;
+    padding: 13px;
+    margin-bottom: 12px;
+    box-shadow: 0 2px 7px rgba(0,0,0,0.08);
+}
+
+.status-card h4 {
+    margin: 0 0 8px;
+    color: #073241;
+}
+
+.trust-wrap {
+    background: #ddd;
+    height: 18px;
+    border-radius: 15px;
+    overflow: hidden;
+}
+
+.trust-bar {
+    height: 100%;
+    width: 100%;
+    background: linear-gradient(90deg, #ff4b6e, #ffdd57, #00b894);
+    transition: 0.4s;
+}
+
+.clue {
+    font-size: 13px;
+    background: #eef9f6;
+    border-left: 4px solid #00b894;
+    padding: 8px;
+    margin-bottom: 8px;
+    border-radius: 7px;
+}
+
+/* REWARD PANEL OUTSIDE WINDOW */
+#level2RewardPanel {
+    position: fixed;
+    left: 22px;
+    bottom: 65px;
+    width: 330px;
+    background: rgba(255, 255, 255, 0.96);
+    border: 2px solid #00ffc8;
+    border-radius: 18px;
+    padding: 16px;
+    z-index: 180;
+    box-shadow: 0 0 28px rgba(0,0,0,0.35);
+}
+
+#level2RewardPanel h4 {
+    margin: 0 0 12px;
+    color: #073241;
+    font-size: 18px;
+}
+
+.reward-use-btn {
+    width: 100%;
+    border: 1px solid rgba(0,184,148,0.35);
+    border-radius: 10px;
+    padding: 10px;
+    margin-bottom: 8px;
+    background: #eef9f6;
+    color: #073241;
+    font-weight: 800;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.reward-use-btn:hover {
+    background: #d7fff6;
+}
+
+.reward-use-btn:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+}
+
+.reward-use-btn span {
+    background: #073241;
+    color: white;
+    border-radius: 999px;
+    padding: 3px 9px;
+    min-width: 32px;
+    text-align: center;
+}
+
+.reward-hint-counter {
+    font-size: 13px;
+    color: #073241;
+    margin: 8px 0 0;
+}
+
+/* REWARD POPUP */
+.reward-toast {
+    position: fixed;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    border: 3px solid #00ffc8;
+    border-radius: 18px;
+    padding: 24px;
+    width: 440px;
+    max-width: calc(100% - 40px);
+    text-align: center;
+    z-index: 99999;
+    color: #073241;
+    box-shadow: 0 0 35px rgba(0,0,0,0.35);
+    animation: rewardPop 0.25s ease;
+}
+
+.reward-toast h3 {
+    margin: 0 0 10px;
+    color: #00b894;
+}
+
+.reward-toast p {
+    margin: 0;
+    line-height: 1.5;
+}
+
+@keyframes rewardPop {
+    from {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0.85);
+    }
+    to {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+    }
+}
+
+/* MODALS */
+.modal-bg {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.55);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 200;
+}
+
+.modal {
+    width: 470px;
+    background: white;
+    border-radius: 18px;
+    padding: 25px;
+    text-align: center;
+    box-shadow: 0 0 30px rgba(0,0,0,0.5);
+}
+
+.modal h2 {
+    margin-top: 0;
+}
+
+.modal.correct h2 {
+    color: #00b894;
+}
+
+.modal.wrong h2 {
+    color: #ff4b6e;
+}
+
+.modal button {
+    background: #073241;
+    color: white;
+    border: none;
+    padding: 12px 18px;
+    border-radius: 10px;
+    font-weight: bold;
+    cursor: pointer;
+    margin: 5px;
+}
+
+.folder-choice {
+    display: grid;
+    gap: 10px;
+    margin-top: 15px;
+}
+
+.folder-choice button {
+    background: #eef2f4;
+    color: #073241;
+    border: 1px solid #ccd5db;
+    text-align: left;
+}
+
+.folder-choice button:hover {
+    background: #00ffc8;
+}
+
+/* RESULT */
+.result-screen {
+    position: fixed;
+    inset: 0;
+    background:
+        radial-gradient(circle at top, rgba(0,255,200,0.2), transparent 35%),
+        #031014;
+    color: white;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 300;
+}
+
+.result-card {
+    width: 650px;
+    background: rgba(255,255,255,0.1);
+    border: 2px solid #00ffc8;
+    border-radius: 22px;
+    padding: 35px;
+    text-align: center;
+    box-shadow: 0 0 35px rgba(0,255,200,0.22);
+}
+
+.result-card h1 {
+    color: #00ffc8;
+}
+
+.result-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+    margin: 25px 0;
+}
+
+.result-box {
+    background: rgba(0,0,0,0.35);
+    padding: 18px;
+    border-radius: 15px;
+}
+
+.result-card button {
+    background: #00ffc8;
+    color: #031014;
+    border: none;
+    padding: 13px 18px;
+    border-radius: 10px;
+    font-weight: bold;
+    cursor: pointer;
+    margin: 5px;
+}
+
+/* COIN POPUP */
+#coinRewardPopup {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.72);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 99999;
+}
+
+.coin-popup-card {
+    width: 420px;
+    max-width: calc(100% - 40px);
+    background: rgba(5, 12, 30, 0.98);
+    border: 2px solid rgba(255, 216, 107, 0.85);
+    border-radius: 26px;
+    padding: 34px 26px;
+    text-align: center;
+    box-shadow: 0 0 45px rgba(255, 216, 107, 0.35);
+    color: white;
+}
+
+.coin-popup-icon {
+    font-size: 42px;
+    margin-bottom: 12px;
+}
+
+.coin-popup-card h2 {
+    margin: 0 0 12px;
+    color: #00ffc8;
+    font-size: 30px;
+}
+
+.coin-popup-card p {
+    margin: 0 0 22px;
+    color: #d8f7ff;
+    font-size: 18px;
+}
+
+.coin-popup-card strong {
+    color: #ffd86b;
+    font-size: 24px;
+}
+
+.coin-popup-card button {
+    border: none;
+    border-radius: 14px;
+    padding: 13px 24px;
+    background: #00ffc8;
+    color: #031014;
+    font-weight: 900;
+    font-size: 16px;
+    cursor: pointer;
+}
+</style>
+</head>
+
+<body>
+
+<!-- INTRO -->
+<div class="intro" id="intro">
+    <div class="intro-box">
+        <h1>Level 2: Phishing Pond</h1>
+
+        <p>
+            Welcome to your virtual office computer. Emails will arrive one by one.
+            Your task is to inspect each email carefully and decide what to do.
+        </p>
+
+        <div class="folder-guide">
+            <div class="guide-card">
+                <h3>👥 Team Folder</h3>
+                <p>Move normal work, lecturer, HR, IT, or university emails here.</p>
+            </div>
+
+            <div class="guide-card">
+                <h3>📢 Social Folder</h3>
+                <p>Move normal social updates, event messages, or community emails here.</p>
+            </div>
+
+            <div class="guide-card">
+                <h3>📁 Miscellaneous Folder</h3>
+                <p>Move safe emails that do not clearly belong to Team or Social here.</p>
+            </div>
+        </div>
+
+        <p>
+            If an email is phishing, do not move it. Click <b>Report Phish</b>.
+            Look for fake domains, urgent pressure, strange links, and dangerous attachments.
+        </p>
+
+        <button onclick="startSimulation()">Start Level</button>
+    </div>
+</div>
+
+<!-- DESKTOP -->
+<div class="desktop">
+    <div class="desktop-icon">
+        <div class="icon-box">🗑️</div>
+        <span>Recycle Bin</span>
+    </div>
+
+    <div class="desktop-icon">
+        <div class="icon-box">💻</div>
+        <span>My Computer</span>
+    </div>
+
+    <div class="desktop-icon">
+        <div class="icon-box">🌐</div>
+        <span>Network</span>
+    </div>
+
+    <div class="desktop-icon" onclick="openMailApp()">
+        <div class="icon-box" id="mailIcon">📧</div>
+        <span>Mail</span>
+    </div>
+</div>
+
+<!-- NOTIFICATION -->
+<div class="notification" id="notification">
+    <h3>📧 You Have New Mail!</h3>
+    <p id="notificationText">A new message has arrived in your inbox.</p>
+    <button onclick="openMailApp()">Open Inbox</button>
+</div>
+
+<!-- MAIL WINDOW -->
+<div class="window" id="mailWindow">
+    <div class="window-title">
+        📧 CyberEscape Mail
+        <div class="window-controls">
+            <div class="ctrl"></div>
+            <div class="ctrl yellow"></div>
+            <div class="ctrl green"></div>
+        </div>
+    </div>
+
+    <div class="mail-layout">
+
+        <div class="left-nav">
+            <div class="app-tabs">
+                <div class="app-tab active">Mail</div>
+                <div class="app-tab">People</div>
+                <div class="app-tab">Calendar</div>
+            </div>
+
+            <div class="folder active">Inbox <small id="inboxCount">0</small></div>
+            <div class="folder">Team <small id="teamCount">0</small></div>
+            <div class="folder">Social <small id="socialCount">0</small></div>
+            <div class="folder">Miscellaneous <small id="miscCount">0</small></div>
+            <div class="folder">SPAM</div>
+            <div class="folder">Game Rules</div>
+        </div>
+
+        <div class="email-list">
+            <div class="toolbar">
+                <button class="tool-btn move-btn" onclick="openMoveModal()">📁 Move</button>
+                <button class="tool-btn report-btn" onclick="reportPhish()">🚨 Report Phish</button>
+            </div>
+
+            <div id="emailItems"></div>
+        </div>
+
+        <div class="read-pane">
+            <div class="email-subject" id="readSubject">No email selected</div>
+
+            <div class="meta">
+                <div><b>From:</b> <span id="readSender">-</span></div>
+                <div><b>To:</b> you@cyberescape.edu</div>
+                <div><b>Time:</b> <span id="readTime">-</span></div>
+            </div>
+
+            <div class="email-body" id="readBody">
+                Wait for a new email notification, then open the inbox.
+            </div>
+
+            <div id="readAttachment"></div>
+        </div>
+
+        <div class="side-panel">
+            <div class="status-card">
+                <h4>Mission Status</h4>
+                <p>Score: <b id="score">0</b></p>
+                <p>Phish Caught: <b id="caught">0</b></p>
+                <p>Missed: <b id="missed">0</b></p>
+                <p>Email: <b id="progress">0/0</b></p>
+                <p>Time: <b id="timer">0s</b></p>
+                <p>Reward Hints: <b id="rewardHintsCountSide">0</b></p>
+            </div>
+
+            <div class="status-card">
+                <h4>Trust Level</h4>
+                <div class="trust-wrap">
+                    <div class="trust-bar" id="trustBar"></div>
+                </div>
+                <p><b id="trustText">100%</b></p>
+            </div>
+
+            <div class="status-card" id="phishingCluesCard">
+                <h4>Phishing Clues</h4>
+                <div class="clue">Check if the sender domain is real.</div>
+                <div class="clue">Be careful with urgent pressure.</div>
+                <div class="clue">Do not trust strange links.</div>
+                <div class="clue">Unexpected attachments may be dangerous.</div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<!-- REWARD PANEL OUTSIDE MAIL WINDOW -->
+<div id="level2RewardPanel">
+    <h4>Level 2 Reward Items</h4>
+
+    <button type="button" class="reward-use-btn" id="extraHintBtn" onclick="useLevel2ExtraHint()">
+        💡 Extra Phishing Hint
+            <span id="extraHintCount">0</span>
+    </button>
+    
+    <button type="button" class="reward-use-btn" id="trustRestoreBtn" onclick="useTrustRestore()">
+            💚 Trust Restore +15%
+            <span id="trustRestoreCount">0</span>
+    </button>
+
+    <p class="reward-hint-counter">
+        Reward Hints Used: <b id="rewardHintsCount">0</b>
+    </p>
+</div>
+
+<!-- MOVE MODAL -->
+<div class="modal-bg" id="moveModalBg">
+    <div class="modal">
+        <h2>Move Email</h2>
+        <p>Choose the correct folder for this safe email.</p>
+
+        <div class="folder-choice">
+            <button onclick="moveEmail('Team')">👥 Team - work, university, IT, HR, lecturer emails</button>
+            <button onclick="moveEmail('Social')">📢 Social - events, community, announcements</button>
+            <button onclick="moveEmail('Miscellaneous')">📁 Miscellaneous - other safe emails</button>
+        </div>
+
+        <button onclick="closeMoveModal()">Cancel</button>
+    </div>
+</div>
+
+<!-- FEEDBACK MODAL -->
+<div class="modal-bg" id="modalBg">
+    <div class="modal" id="modal">
+        <h2 id="modalTitle"></h2>
+        <p id="modalText"></p>
+        <button onclick="continueGame()">Continue</button>
+    </div>
+</div>
+
+<!-- RESULT -->
+<div class="result-screen" id="resultScreen">
+    <div class="result-card">
+        <h1>Phishing Pond Complete</h1>
+        <p id="resultMessage"></p>
+
+        <div class="result-grid">
+            <div class="result-box">Final Score<br><b id="finalScore">0</b></div>
+            <div class="result-box">Phish Caught<br><b id="finalCaught">0</b></div>
+            <div class="result-box">Missed Phish<br><b id="finalMissed">0</b></div>
+            <div class="result-box">Trust Left<br><b id="finalTrust">100%</b></div>
+        </div>
+
+        <button onclick="restartGame()">Play Again</button>
+        <button onclick="window.location.href='/level3'">Continue to Level 3</button>
+        <button onclick="window.location.href='/dashboard'">Back to Dashboard</button>
+    </div>
+</div>
+
+<!-- COIN POPUP -->
+<div id="coinRewardPopup">
+    <div class="coin-popup-card">
+        <div class="coin-popup-icon">🪙</div>
+        <h2>Cyber Coins Earned!</h2>
+        <p>You received <strong id="coinAmountText">0</strong> Cyber Coins.</p>
+        <button onclick="closeCoinPopup()">Continue</button>
+    </div>
+</div>
+
+<!-- TASKBAR -->
+<div class="taskbar">
+    <button class="start-btn">Start</button>
+    <div class="task-app" onclick="openMailApp()">📧 Mail</div>
+    <div class="task-app">👥 People</div>
+    <div class="task-app">📅 Calendar</div>
+    <div class="clock" id="clock">8:55 AM</div>
+</div>
+
+<script>
+const level2Sounds = {
+    correct: new Audio("/static/audio/correct.mp3"),
+    wrong: new Audio("/static/audio/wrong.mp3")
+};
+
+function playLevel2Sound(name) {
+    if (!level2Sounds[name]) return;
+
+    level2Sounds[name].currentTime = 0;
+    level2Sounds[name].volume = 0.45;
+    level2Sounds[name].play().catch(() => {});
+}
+const allEmails = [
+    {
+        sender: "IT Support <support@cyberescape.edu>",
+        shortSender: "IT Support",
+        subject: "Password reset completed",
+        body: `
+            Your CyberEscape account password was changed successfully.
+            If this was you, no action is required.<br><br>
+            Security page:
+            <span class="fake-link">https://cyberescape.edu/account/security</span>
+        `,
+        attachment: "",
+        time: "8:56 AM",
+        type: "safe",
+        folder: "Team",
+        explanation: "This is safe because the sender domain is correct and it does not ask for your password."
+    },
+    {
+        sender: "Bank Security <security@bank-alerts-login.com>",
+        shortSender: "Bank Security",
+        subject: "URGENT: Your account will be closed",
+        body: `
+            Your bank account will be locked in 10 minutes.
+            Click the link below and verify your password now.<br><br>
+            <span class="fake-link">http://bank-alerts-login.com/verify-now</span>
+        `,
+        attachment: "",
+        time: "8:58 AM",
+        type: "phish",
+        folder: "SPAM",
+        explanation: "This is phishing because it uses urgency and a fake banking domain."
+    },
+    {
+        sender: "CyberEscape Events <events@cyberescape.edu>",
+        shortSender: "CyberEscape Events",
+        subject: "Cybersecurity awareness event",
+        body: `
+            You are invited to join the cybersecurity awareness event this Friday.
+            More details are available on the student portal.<br><br>
+            <span class="fake-link">https://cyberescape.edu/events</span>
+        `,
+        attachment: "",
+        time: "9:01 AM",
+        type: "safe",
+        folder: "Social",
+        explanation: "This is safe because it is a normal event announcement from the official domain."
+    },
+    {
+        sender: "HR Office <hr@cyberescape.edu>",
+        shortSender: "HR Office",
+        subject: "Updated holiday schedule",
+        body: `
+            The updated holiday schedule is available on the official portal.
+            Please check it when you are free.<br><br>
+            <span class="fake-link">https://cyberescape.edu/hr/holiday</span>
+        `,
+        attachment: "holiday_schedule.pdf",
+        time: "9:03 AM",
+        type: "safe",
+        folder: "Team",
+        explanation: "This is safe because the sender and link use the official domain."
+    },
+    {
+        sender: "Microsoft Security <microsoft-support@outlook-security.net>",
+        shortSender: "Microsoft Security",
+        subject: "Unusual login detected",
+        body: `
+            We detected unusual login activity on your account.
+            Open the security form and enter your password to continue using your account.<br><br>
+            <span class="fake-link">http://outlook-security.net/login</span>
+        `,
+        attachment: "Security_Form.exe",
+        time: "9:07 AM",
+        type: "phish",
+        folder: "SPAM",
+        explanation: "This is phishing because the domain is not official Microsoft and the .exe attachment is dangerous."
+    },
+    {
+        sender: "Delivery Service <parcel@fastdelivery-check.com>",
+        shortSender: "Delivery Service",
+        subject: "Package delivery failed",
+        body: `
+            Your package delivery failed. Pay a small fee now to reschedule your delivery.<br><br>
+            <span class="fake-link">http://fastdelivery-check.com/pay-fee</span>
+        `,
+        attachment: "",
+        time: "9:12 AM",
+        type: "phish",
+        folder: "SPAM",
+        explanation: "This is phishing because it asks for payment through a suspicious delivery link."
+    },
+    {
+        sender: "Lecturer <lecturer@university.edu>",
+        shortSender: "Lecturer",
+        subject: "Class reminder",
+        body: `
+            Reminder: Tomorrow's class starts at 10 AM.
+            Please bring your notes and laptop.
+        `,
+        attachment: "",
+        time: "9:18 AM",
+        type: "safe",
+        folder: "Team",
+        explanation: "This is safe because it has a normal sender, normal message, and no suspicious request."
+    },
+    {
+        sender: "Newsletter <news@techcommunity.org>",
+        shortSender: "Newsletter",
+        subject: "Weekly technology news",
+        body: `
+            Here is your weekly technology newsletter.
+            Read about new cybersecurity tools and student events.
+        `,
+        attachment: "",
+        time: "9:21 AM",
+        type: "safe",
+        folder: "Miscellaneous",
+        explanation: "This is safe because it is a normal newsletter with no suspicious action request."
+    },
+    {
+        sender: "Admin Office <admin@cyberescape-edu.com>",
+        shortSender: "Admin Office",
+        subject: "Student portal update required",
+        body: `
+            All students must update their login details before midnight.
+            Failure to do this will suspend your account.<br><br>
+            <span class="fake-link">https://cyberescape-edu.com/student-login</span>
+        `,
+        attachment: "",
+        time: "9:23 AM",
+        type: "phish",
+        folder: "SPAM",
+        explanation: "This is phishing because the domain looks similar but is not the real cyberescape.edu domain."
+    }
+];
+
+let inbox = [];
+let currentEmailIndex = 0;
+let selectedEmail = null;
+
+let score = 0;
+let caught = 0;
+let missed = 0;
+let trust = 100;
+let handled = 0;
+let hintsUsed = 0;
+
+let teamMoved = 0;
+let socialMoved = 0;
+let miscMoved = 0;
+
+let startTime = null;
+let timerInterval = null;
+let completionTime = 0;
+let progressSaved = false;
+
+let level2Rewards = {
+    level2_extra_hint: 0,
+    level2_trust_restore: 0
+};
+
+function startSimulation() {
+    document.getElementById("intro").style.display = "none";
+
+    startTime = Date.now();
+
+    timerInterval = setInterval(() => {
+        completionTime = Math.floor((Date.now() - startTime) / 1000);
+        document.getElementById("timer").textContent = completionTime + "s";
+    }, 1000);
+
+    loadLevel2Rewards();
+    updateStats();
+
+    setTimeout(() => {
+        receiveNextEmail();
+    }, 900);
+}
+
+function loadLevel2Rewards() {
+    fetch("/api/level_rewards/2")
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                level2Rewards = data.rewards || level2Rewards;
+                updateLevel2RewardPanel();
+            }
+        })
+        .catch(error => {
+            console.error("Error loading Level 2 rewards:", error);
+        });
+}
+
+function updateLevel2RewardPanel() {
+    const extraHintCount = document.getElementById("extraHintCount");
+    const trustCount = document.getElementById("trustRestoreCount");
+    const rewardHintsCount = document.getElementById("rewardHintsCount");
+    const rewardHintsCountSide = document.getElementById("rewardHintsCountSide");
+
+    const extraHintBtn = document.getElementById("extraHintBtn");
+    const trustBtn = document.getElementById("trustRestoreBtn");
+
+    if (extraHintCount) extraHintCount.textContent = level2Rewards.level2_extra_hint || 0;
+    if (trustCount) trustCount.textContent = level2Rewards.level2_trust_restore || 0;
+
+    if (rewardHintsCount) rewardHintsCount.textContent = hintsUsed;
+    if (rewardHintsCountSide) rewardHintsCountSide.textContent = hintsUsed;
+
+    if (extraHintBtn) extraHintBtn.disabled = (level2Rewards.level2_extra_hint || 0) <= 0;
+    if (trustBtn) trustBtn.disabled = (level2Rewards.level2_trust_restore || 0) <= 0 || trust >= 100;
+}
+
+function useLevel2ExtraHint() {
+    if ((level2Rewards.level2_extra_hint || 0) <= 0) return;
+
+    consumeReward("level2_extra_hint", () => {
+        hintsUsed++;
+
+        const message = "Extra Hint: If an email asks you to pay money, delivery fees, bank charges, or urgent payment through a link, it may be phishing.";
+
+        addClueToPanel(message);
+        showRewardToast("Extra Phishing Hint Used", message);
+
+        updateStats();
+        updateLevel2RewardPanel();
+    });
+}
+
+function consumeReward(itemKey, onSuccess) {
+    fetch("/use_reward", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            item_key: itemKey
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            level2Rewards[itemKey] = data.remaining;
+            updateLevel2RewardPanel();
+
+            if (typeof onSuccess === "function") {
+                onSuccess();
+            }
+        } else {
+            showRewardToast("Reward Not Available", data.message || "You do not own this reward.");
+            loadLevel2Rewards();
+        }
+    })
+    .catch(error => {
+        console.error("Error using reward:", error);
+        showRewardToast("Reward Error", "Could not use this reward right now.");
+    });
+}
+
+
+function useTrustRestore() {
+    if ((level2Rewards.level2_trust_restore || 0) <= 0) return;
+
+    if (trust >= 100) {
+        showRewardToast("Trust Already Full", "Your trust level is already 100%.");
+        return;
+    }
+
+    consumeReward("level2_trust_restore", () => {
+        trust += 15;
+        if (trust > 100) trust = 100;
+
+        showRewardToast("Trust Restored", "Your trust level increased by 15%.");
+        updateStats();
+        updateLevel2RewardPanel();
+    });
+}
+
+function addClueToPanel(message) {
+    const clueContainer = document.getElementById("phishingCluesCard");
+    if (!clueContainer) return;
+
+    const clue = document.createElement("div");
+    clue.className = "clue";
+    clue.textContent = message;
+
+    clueContainer.appendChild(clue);
+}
+
+function showRewardToast(title, message) {
+    const oldToast = document.getElementById("rewardToast");
+    if (oldToast) oldToast.remove();
+
+    const toast = document.createElement("div");
+    toast.id = "rewardToast";
+    toast.className = "reward-toast";
+
+    toast.innerHTML = `
+        <h3>${title}</h3>
+        <p>${message}</p>
+    `;
+
+    document.body.appendChild(toast);
+
+    setTimeout(() => {
+        if (toast.parentNode) {
+            toast.remove();
+        }
+    }, 2800);
+}
+
+function receiveNextEmail() {
+    if (currentEmailIndex >= allEmails.length || trust <= 0) {
+        endGame();
+        return;
+    }
+
+    inbox = [allEmails[currentEmailIndex]];
+    selectedEmail = null;
+
+    renderEmailList();
+    clearReadPane();
+
+    document.getElementById("mailIcon").classList.add("pulse");
+    document.getElementById("notificationText").textContent =
+        "New message: " + allEmails[currentEmailIndex].subject;
+    document.getElementById("notification").classList.add("show");
+
+    updateStats();
+}
+
+function openMailApp() {
+    document.getElementById("mailWindow").classList.add("show");
+    document.getElementById("notification").classList.remove("show");
+    document.getElementById("mailIcon").classList.remove("pulse");
+
+    if (inbox.length > 0 && selectedEmail === null) {
+        selectEmail(0);
+    }
+}
+
+function renderEmailList() {
+    const container = document.getElementById("emailItems");
+    container.innerHTML = "";
+
+    inbox.forEach((email, index) => {
+        const item = document.createElement("div");
+        item.className = "email-item";
+        if (selectedEmail === index) item.classList.add("active");
+
+        item.innerHTML = `
+            <div class="from">${email.shortSender}</div>
+            <div class="subject">${email.subject}</div>
+            <div class="preview">${stripHtml(email.body).slice(0, 60)}...</div>
+            <div class="unread-dot"></div>
+        `;
+
+        item.onclick = () => selectEmail(index);
+        container.appendChild(item);
+    });
+
+    document.getElementById("inboxCount").textContent = inbox.length;
+}
+
+function selectEmail(index) {
+    selectedEmail = index;
+    const email = inbox[index];
+
+    document.getElementById("readSubject").textContent = email.subject;
+    document.getElementById("readSender").textContent = email.sender;
+    document.getElementById("readTime").textContent = email.time;
+    document.getElementById("readBody").innerHTML = email.body;
+
+    if (email.attachment) {
+        document.getElementById("readAttachment").innerHTML =
+            `<div class="attachment">📎 Attachment: ${email.attachment}</div>`;
+    } else {
+        document.getElementById("readAttachment").innerHTML = "";
+    }
+
+    renderEmailList();
+}
+
+function clearReadPane() {
+    document.getElementById("readSubject").textContent = "No email selected";
+    document.getElementById("readSender").textContent = "-";
+    document.getElementById("readTime").textContent = "-";
+    document.getElementById("readBody").innerHTML =
+        "A new email has arrived. Open it from the inbox.";
+    document.getElementById("readAttachment").innerHTML = "";
+}
+
+function openMoveModal() {
+    if (selectedEmail === null || inbox.length === 0) {
+        alert("Please select an email first.");
+        return;
+    }
+
+    document.getElementById("moveModalBg").style.display = "flex";
+}
+
+function closeMoveModal() {
+    document.getElementById("moveModalBg").style.display = "none";
+}
+
+function moveEmail(folderName) {
+    if (selectedEmail === null) return;
+
+    closeMoveModal();
+
+    const email = inbox[selectedEmail];
+
+    if (email.type === "phish") {
+    playLevel2Sound("wrong");
+
+    trust -= 20;
+    missed++;
+    } else if (email.folder === folderName) {
+    playLevel2Sound("correct");
+
+    score += 120;
+    } else {
+    playLevel2Sound("wrong");
+
+    score += 40;
+    trust -= 10;
+    }
+
+    if (email.type === "phish") {
+        trust -= 20;
+        missed++;
+
+        showFeedback(
+            false,
+            "Wrong Move",
+            "You moved a phishing email instead of reporting it. " + email.explanation
+        );
+    } else if (email.folder === folderName) {
+        score += 120;
+
+        if (folderName === "Team") teamMoved++;
+        if (folderName === "Social") socialMoved++;
+        if (folderName === "Miscellaneous") miscMoved++;
+
+        showFeedback(
+            true,
+            "Correct Folder",
+            "Good job. This safe email belongs in the " + folderName + " folder. " + email.explanation
+        );
+    } else {
+        score += 40;
+        trust -= 10;
+
+        showFeedback(
+            false,
+            "Wrong Folder",
+            "This email is safe, but it should go to the " + email.folder + " folder, not " + folderName + "."
+        );
+    }
+
+    finishCurrentEmail();
+}
+
+function reportPhish() {
+    if (selectedEmail === null || inbox.length === 0) {
+        alert("Please select an email first.");
+        return;
+    }
+
+    const email = inbox[selectedEmail];
+
+    if (email.type === "phish") {
+    playLevel2Sound("correct");
+
+    score += 130;
+    caught++;
+    } else {
+    playLevel2Sound("wrong");
+
+    trust -= 15;
+    }
+
+    if (email.type === "phish") {
+        score += 130;
+        caught++;
+
+        showFeedback(
+            true,
+            "Phish Reported",
+            "Correct. You reported a phishing email. " + email.explanation
+        );
+    } else {
+        trust -= 15;
+
+        showFeedback(
+            false,
+            "False Report",
+            "This email was actually safe. It should be moved to the " + email.folder + " folder."
+        );
+    }
+
+    finishCurrentEmail();
+}
+
+function finishCurrentEmail() {
+    handled++;
+    currentEmailIndex++;
+
+    inbox = [];
+    selectedEmail = null;
+
+    if (trust < 0) trust = 0;
+
+    renderEmailList();
+    clearReadPane();
+    updateStats();
+}
+
+function showFeedback(correct, title, text) {
+    const modal = document.getElementById("modal");
+    modal.className = correct ? "modal correct" : "modal wrong";
+
+    document.getElementById("modalTitle").textContent =
+        correct ? "✅ " + title : "❌ " + title;
+
+    document.getElementById("modalText").textContent = text;
+    document.getElementById("modalBg").style.display = "flex";
+}
+
+function continueGame() {
+    document.getElementById("modalBg").style.display = "none";
+
+    if (currentEmailIndex >= allEmails.length || trust <= 0) {
+        endGame();
+    } else {
+        setTimeout(() => {
+            receiveNextEmail();
+        }, 700);
+    }
+}
+
+function updateStats() {
+    document.getElementById("score").textContent = score;
+    document.getElementById("caught").textContent = caught;
+    document.getElementById("missed").textContent = missed;
+    document.getElementById("progress").textContent = handled + "/" + allEmails.length;
+    document.getElementById("trustText").textContent = trust + "%";
+    document.getElementById("trustBar").style.width = trust + "%";
+
+    document.getElementById("inboxCount").textContent = inbox.length;
+    document.getElementById("teamCount").textContent = teamMoved;
+    document.getElementById("socialCount").textContent = socialMoved;
+    document.getElementById("miscCount").textContent = miscMoved;
+
+    updateLevel2RewardPanel();
+}
+
+function endGame() {
+    if (progressSaved) return;
+    progressSaved = true;
+
+    if (timerInterval) {
+        clearInterval(timerInterval);
+    }
+
+    if (startTime) {
+        completionTime = Math.floor((Date.now() - startTime) / 1000);
+    }
+
+    document.getElementById("timer").textContent = completionTime + "s";
+
+    saveLevel2Progress();
+
+    document.getElementById("resultScreen").style.display = "flex";
+
+    document.getElementById("finalScore").textContent = score;
+    document.getElementById("finalCaught").textContent = caught;
+    document.getElementById("finalMissed").textContent = missed;
+    document.getElementById("finalTrust").textContent = trust + "%";
+
+    let message = "";
+
+    if (trust <= 0) {
+        message = "Game over. Your trust level reached 0%. Too many unsafe email decisions were made.";
+    } else if (missed === 0) {
+        message = "Excellent work! You handled the inbox carefully and reported all phishing emails. Level 3 is now unlocked.";
+    } else {
+        message = "Good job. You completed Level 2, but you missed some phishing emails. Level 3 is now unlocked.";
+    }
+
+    document.getElementById("resultMessage").textContent = message;
+}
+
+function saveLevel2Progress() {
+    fetch("/save_level_progress", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            level_id: 2,
+            status: "completed",
+            score: score,
+            hints_used: hintsUsed,
+            completion_time: completionTime
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            const coinsEarned = data.coins_earned || 0;
+
+            if (coinsEarned > 0) {
+                showCoinPopup(coinsEarned);
+            }
+
+            console.log("Level 2 progress saved successfully.");
+        } else {
+            console.log("Progress save failed:", data.message);
+        }
+    })
+    .catch(error => {
+        console.error("Error saving progress:", error);
+    });
+}
+
+function showCoinPopup(coinsEarned) {
+    document.getElementById("coinAmountText").textContent = coinsEarned;
+    document.getElementById("coinRewardPopup").style.display = "flex";
+}
+
+function closeCoinPopup() {
+    document.getElementById("coinRewardPopup").style.display = "none";
+}
+
+function restartGame() {
+    location.reload();
+}
+
+function stripHtml(html) {
+    const temp = document.createElement("div");
+    temp.innerHTML = html;
+    return temp.textContent || temp.innerText || "";
+}
+
+function updateClock() {
+    const now = new Date();
+    document.getElementById("clock").textContent =
+        now.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+}
+
+setInterval(updateClock, 1000);
+updateClock();
+loadLevel2Rewards();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+
+{% block title %}CyberEscape | Admin Login{% endblock %}
+
+{% block content %}
+<section class="auth-page">
+    <div class="scan-lines"></div>
+    <div class="floating-particles"></div>
+
+    <div class="auth-card">
+        <h1 class="auth-main-title">
+            <span class="green-glow">ADMIN</span> <span class="blue-glow">LOGIN</span>
+        </h1>
+
+        <p class="auth-sub">
+            Enter admin credentials to review users, analytics, and game progress.
+        </p>
+
+        {% if error %}
+        <div class="error-msg">{{ error }}</div>
+        {% endif %}
+
+        <form method="POST" class="auth-form">
+            <div class="input-box">
+                <label for="username">Admin Username</label>
+                <input type="text" id="username" name="username" placeholder="Enter admin username" required>
+            </div>
+
+            <div class="input-box">
+                <label for="password">Admin Password</label>
+                <div class="password-wrapper">
+                    <input type="password" id="password" name="password" placeholder="Enter admin password" required>
+                    <span class="toggle-password" onclick="togglePassword('password', this)">
+                        <i class="fa-solid fa-eye-slash"></i>
+                    </span>
+                </div>
+            </div>
+
+            <button type="submit" class="auth-btn">ADMIN LOGIN</button>
+        </form>
+
+        <p class="auth-link">
+            Player account?
+            <a href="{{ url_for('login') }}">Go to Player Login</a>
+        </p>
+    </div>
+</section>
+{% endblock %}

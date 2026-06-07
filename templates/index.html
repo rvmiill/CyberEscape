@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+
+{% block title %}CyberEscape | Home{% endblock %}
+
+{% block content %}
+<section class="game-home">
+
+    <div class="scan-lines"></div>
+    <div class="floating-particles"></div>
+
+    <div class="game-home-content">
+        <h1 class="game-title">
+            <span class="green-glow">CYBER</span><span class="blue-glow">ESCAPE</span>
+        </h1>
+
+        <p class="home-subtitle">
+            A Gamified Virtual Escape Room for Cybersecurity Awareness
+        </p>
+
+        <div class="intro-panel">
+            <h2>Welcome Students</h2>
+            <p>
+                CyberEscape is a fun learning game for students who want to understand
+                cybersecurity in a simple and interesting way.
+            </p>
+            <p>
+                In this game, you will complete missions about passwords, phishing,
+                malware, encryption, and network defense.
+            </p>
+            <p>
+                Learn, play, think, and improve your cyber skills step by step.
+            </p>
+        </div>
+
+        <p class="mini-tagline">Train your mind. Defend your future.</p>
+        
+        <div class="start-actions">
+            <a href="{{ url_for('login') }}" class="game-start-btn">⚡ START MISSION</a>
+            <a href="{{ url_for('register') }}" class="game-alt-btn">REGISTER</a>
+        </div>
+    </div>
+</section>
+{% endblock %}

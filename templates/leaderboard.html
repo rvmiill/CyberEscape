@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>CyberEscape Leaderboard</title>
+
+<style>
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    min-height: 100vh;
+    font-family: "Segoe UI", Arial, sans-serif;
+    background:
+        radial-gradient(circle at top, rgba(0,255,200,0.18), transparent 35%),
+        linear-gradient(135deg, #020617, #08122a, #020617);
+    color: white;
+}
+
+.page {
+    min-height: 100vh;
+    padding: 30px;
+}
+
+.header {
+    max-width: 1100px;
+    margin: 0 auto 25px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.header h1 {
+    margin: 0;
+    color: #00ffc8;
+    font-size: 38px;
+    text-shadow: 0 0 18px rgba(0,255,200,0.45);
+}
+
+.header p {
+    margin: 8px 0 0;
+    color: #b6c7d6;
+}
+
+.back-btn {
+    text-decoration: none;
+    background: #00ffc8;
+    color: #031014;
+    padding: 13px 20px;
+    border-radius: 12px;
+    font-weight: bold;
+}
+
+.back-btn:hover {
+    transform: scale(1.04);
+}
+
+.leaderboard-card {
+    max-width: 1100px;
+    margin: auto;
+    background: rgba(15, 23, 42, 0.94);
+    border: 2px solid rgba(0,255,200,0.45);
+    border-radius: 24px;
+    box-shadow: 0 0 35px rgba(0,255,200,0.18);
+    overflow: hidden;
+}
+
+.top-banner {
+    padding: 22px 26px;
+    background: rgba(0,255,200,0.08);
+    border-bottom: 1px solid rgba(0,255,200,0.35);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.top-banner h2 {
+    margin: 0;
+    color: #00ffc8;
+}
+
+.update-text {
+    color: #facc15;
+    font-weight: bold;
+    font-size: 14px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th {
+    background: rgba(2, 6, 23, 0.95);
+    color: #00ffc8;
+    text-align: left;
+    padding: 16px;
+    font-size: 15px;
+}
+
+td {
+    padding: 16px;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    color: #e5f3ff;
+}
+
+tr:hover {
+    background: rgba(0,255,200,0.06);
+}
+
+.rank {
+    font-weight: bold;
+    font-size: 20px;
+}
+
+.rank-1 {
+    color: #facc15;
+}
+
+.rank-2 {
+    color: #cbd5e1;
+}
+
+.rank-3 {
+    color: #fb923c;
+}
+
+.username {
+    font-weight: bold;
+    color: white;
+}
+
+.score {
+    font-weight: bold;
+    color: #86efac;
+}
+
+.empty {
+    text-align: center;
+    padding: 40px;
+    color: #b6c7d6;
+}
+
+.badge {
+    display: inline-block;
+    padding: 6px 10px;
+    border-radius: 999px;
+    background: rgba(0,255,200,0.12);
+    border: 1px solid rgba(0,255,200,0.35);
+    color: #00ffc8;
+    font-weight: bold;
+    font-size: 13px;
+}
+
+.loading {
+    text-align: center;
+    padding: 40px;
+    color: #facc15;
+    font-weight: bold;
+}
+
+.small-note {
+    max-width: 1100px;
+    margin: 18px auto 0;
+    color: #b6c7d6;
+    font-size: 14px;
+    text-align: center;
+}
+
+@media (max-width: 850px) {
+    .page {
+        padding: 18px;
+    }
+
+    .header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+    }
+
+    table {
+        font-size: 13px;
+    }
+
+    th, td {
+        padding: 10px;
+    }
+
+    .header h1 {
+        font-size: 30px;
+    }
+
+    .leaderboard-card {
+        overflow-x: auto;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div class="page">
+    <div class="header">
+        <div>
+            <h1>🏆 CyberEscape Leaderboard</h1>
+            <p>See the top players based on score, completed levels, hints, attempts, and time.</p>
+        </div>
+
+        <a class="back-btn" href="/dashboard">Back to Dashboard</a>
+    </div>
+
+    <div class="leaderboard-card">
+        <div class="top-banner">
+            <h2>Top Players</h2>
+            <span class="update-text" id="updateText">Updating...</span>
+        </div>
+
+        <div id="leaderboardContent" class="loading">
+            Loading leaderboard...
+        </div>
+    </div>
+
+    <div class="small-note">
+        Leaderboard ranking: highest score first, then completed levels, fewer hints, faster time, and fewer attempts.
+    </div>
+</div>
+
+<script>
+function formatTime(seconds) {
+    seconds = Number(seconds) || 0;
+
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = seconds % 60;
+
+    if (minutes <= 0) {
+        return remainingSeconds + "s";
+    }
+
+    return minutes + "m " + remainingSeconds + "s";
+}
+
+function rankClass(rank) {
+    if (rank === 1) return "rank rank-1";
+    if (rank === 2) return "rank rank-2";
+    if (rank === 3) return "rank rank-3";
+    return "rank";
+}
+
+function rankIcon(rank) {
+    if (rank === 1) return "🥇";
+    if (rank === 2) return "🥈";
+    if (rank === 3) return "🥉";
+    return "#" + rank;
+}
+
+function loadLeaderboard() {
+    fetch("/api/leaderboard")
+        .then(response => response.json())
+        .then(data => {
+            const container = document.getElementById("leaderboardContent");
+
+            if (!data.success) {
+                container.innerHTML = '<div class="empty">Unable to load leaderboard.</div>';
+                return;
+            }
+
+            const leaderboard = data.leaderboard;
+
+            if (leaderboard.length === 0) {
+                container.innerHTML = '<div class="empty">No players yet. Complete a level to appear here.</div>';
+                return;
+            }
+
+            let html = `
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Rank</th>
+                            <th>Player</th>
+                            <th>Total Score</th>
+                            <th>Completed Levels</th>
+                            <th>Hints Used</th>
+                            <th>Attempts</th>
+                            <th>Total Time</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+
+            leaderboard.forEach(player => {
+                html += `
+                    <tr>
+                        <td class="${rankClass(player.rank)}">${rankIcon(player.rank)}</td>
+                        <td class="username">${player.username}</td>
+                        <td class="score">${player.total_score}</td>
+                        <td><span class="badge">${player.completed_levels}/5</span></td>
+                        <td>${player.total_hints}</td>
+                        <td>${player.total_attempts}</td>
+                        <td>${formatTime(player.total_time)}</td>
+                    </tr>
+                `;
+            });
+
+            html += `
+                    </tbody>
+                </table>
+            `;
+
+            container.innerHTML = html;
+
+            const now = new Date();
+            document.getElementById("updateText").textContent =
+                "Updated at " + now.toLocaleTimeString();
+        })
+        .catch(error => {
+            console.error(error);
+            document.getElementById("leaderboardContent").innerHTML =
+                '<div class="empty">Error loading leaderboard.</div>';
+        });
+}
+
+loadLeaderboard();
+
+setInterval(loadLeaderboard, 5000);
+</script>
+
+</body>
+</html>

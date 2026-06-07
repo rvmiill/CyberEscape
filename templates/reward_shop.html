@@ -1,0 +1,307 @@
+{% extends 'base.html' %}
+
+{% block title %}CyberEscape | Reward Shop{% endblock %}
+
+{% block content %}
+<style>
+    .shop-page {
+        min-height: 100vh;
+        padding: 36px 24px;
+    }
+
+    .shop-shell {
+        max-width: 1200px;
+        margin: auto;
+    }
+
+    .shop-header {
+        background: rgba(5, 12, 30, 0.94);
+        border: 1px solid rgba(0, 207, 255, 0.35);
+        border-radius: 24px;
+        padding: 28px;
+        margin-bottom: 24px;
+        box-shadow: 0 0 30px rgba(0, 207, 255, 0.12);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 16px;
+    }
+
+    .shop-header h1 {
+        margin: 0;
+        color: #00ff88;
+        font-size: 38px;
+    }
+
+    .shop-header p {
+        color: #b8d7e8;
+        margin: 8px 0 0;
+    }
+
+    .coin-balance {
+        background: rgba(255, 216, 107, 0.14);
+        border: 1px solid rgba(255, 216, 107, 0.65);
+        color: #ffd86b;
+        padding: 16px 22px;
+        border-radius: 18px;
+        font-size: 22px;
+        font-weight: 900;
+        white-space: nowrap;
+    }
+
+    .shop-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 18px;
+    }
+
+    .shop-card {
+        background: rgba(5, 12, 30, 0.94);
+        border: 1px solid rgba(0, 207, 255, 0.28);
+        border-radius: 22px;
+        padding: 22px;
+        box-shadow: 0 0 22px rgba(0, 207, 255, 0.08);
+        display: flex;
+        flex-direction: column;
+        min-height: 330px;
+    }
+
+    .shop-icon {
+        width: 72px;
+        height: 72px;
+        border-radius: 20px;
+        background: rgba(0, 207, 255, 0.12);
+        border: 1px solid rgba(0, 207, 255, 0.45);
+        color: #00cfff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 32px;
+        margin-bottom: 16px;
+    }
+
+    .shop-card h3 {
+        margin: 0 0 8px;
+        color: white;
+        font-size: 22px;
+    }
+
+    .shop-level {
+        color: #00ff88;
+        font-weight: 800;
+        margin-bottom: 12px;
+    }
+
+    .shop-card p {
+        color: #b8d7e8;
+        line-height: 1.5;
+        flex: 1;
+    }
+
+    .shop-bottom {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        margin-top: 16px;
+    }
+
+    .item-cost {
+        color: #ffd86b;
+        font-weight: 900;
+        font-size: 18px;
+    }
+
+    .buy-btn {
+        border: none;
+        border-radius: 12px;
+        padding: 12px 16px;
+        background: linear-gradient(135deg, #00ff88, #00cfff);
+        color: #031126;
+        font-weight: 900;
+        cursor: pointer;
+    }
+
+    .owned-badge {
+        margin-top: 12px;
+        background: rgba(34, 197, 94, 0.14);
+        border: 1px solid rgba(34, 197, 94, 0.55);
+        color: #86efac;
+        padding: 8px 12px;
+        border-radius: 999px;
+        font-weight: 800;
+        text-align: center;
+    }
+
+    .shop-actions {
+        margin-top: 24px;
+        text-align: center;
+    }
+
+    .back-btn {
+        display: inline-block;
+        text-decoration: none;
+        padding: 14px 22px;
+        border-radius: 12px;
+        background: rgba(255, 255, 255, 0.08);
+        border: 1px solid rgba(0, 207, 255, 0.35);
+        color: white;
+        font-weight: 900;
+    }
+
+    .shop-popup {
+        position: fixed;
+        inset: 0;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        background: rgba(0,0,0,0.72);
+        z-index: 99999;
+    }
+
+    .shop-popup-card {
+        width: 430px;
+        max-width: calc(100% - 40px);
+        background: rgba(5, 12, 30, 0.98);
+        border: 2px solid rgba(255, 216, 107, 0.85);
+        border-radius: 26px;
+        padding: 34px 26px;
+        text-align: center;
+        color: white;
+        box-shadow: 0 0 45px rgba(255, 216, 107, 0.35);
+    }
+
+    .shop-popup-card h2 {
+        color: #00ff88;
+        margin-top: 0;
+    }
+
+    .shop-popup-card p {
+        color: #d8f7ff;
+        line-height: 1.5;
+    }
+
+    .shop-popup-card button {
+        border: none;
+        border-radius: 12px;
+        padding: 12px 20px;
+        background: #00ff88;
+        color: #031126;
+        font-weight: 900;
+        cursor: pointer;
+    }
+
+    @media (max-width: 1000px) {
+        .shop-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .shop-header {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+    }
+</style>
+
+<section class="shop-page">
+    <div class="shop-shell">
+        <div class="shop-header">
+            <div>
+                <h1>Cyber Coins Reward Shop</h1>
+                <p>Buy the tools using the Cyber Coins you earn from completing levels.</p>
+            </div>
+
+            <div class="coin-balance">
+                <i class="fa-solid fa-coins"></i>
+                <span id="coinBalance">{{ coins }}</span> Coins
+            </div>
+        </div>
+
+        <div class="shop-grid">
+            {% for item in items %}
+            <div class="shop-card">
+                <div class="shop-icon">
+                    <i class="fa-solid {{ item.icon }}"></i>
+                </div>
+
+                <h3>{{ item.name }}</h3>
+                <div class="shop-level">{{ item.level }}</div>
+                <p>{{ item.desc }}</p>
+
+                <div class="shop-bottom">
+                    <div class="item-cost">
+                        <i class="fa-solid fa-coins"></i>
+                        {{ item.cost }}
+                    </div>
+
+                    <button class="buy-btn" onclick="buyReward('{{ item.key }}')">
+                        Buy
+                    </button>
+                </div>
+
+                {% if user_rewards.get(item.key, 0) > 0 %}
+                <div class="owned-badge">
+                    Owned: {{ user_rewards.get(item.key, 0) }}
+                </div>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+
+        <div class="shop-actions">
+            <a href="{{ url_for('dashboard') }}" class="back-btn">
+                <i class="fa-solid fa-arrow-left"></i>
+                Back to Dashboard
+            </a>
+        </div>
+    </div>
+</section>
+
+<div class="shop-popup" id="shopPopup">
+    <div class="shop-popup-card">
+        <h2 id="popupTitle">Purchase Complete</h2>
+        <p id="popupMessage">Item purchased successfully.</p>
+        <button onclick="closeShopPopup()">Continue</button>
+    </div>
+</div>
+
+<script>
+function buyReward(itemKey) {
+    fetch("/buy_reward", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            item_key: itemKey
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            document.getElementById("coinBalance").textContent = data.new_balance;
+            showShopPopup("Purchase Complete", data.message);
+            setTimeout(() => {
+                location.reload();
+            }, 900);
+        } else {
+            showShopPopup("Cannot Buy Item", data.message);
+        }
+    })
+    .catch(error => {
+        console.error(error);
+        showShopPopup("Error", "Something went wrong. Please try again.");
+    });
+}
+
+function showShopPopup(title, message) {
+    document.getElementById("popupTitle").textContent = title;
+    document.getElementById("popupMessage").textContent = message;
+    document.getElementById("shopPopup").style.display = "flex";
+}
+
+function closeShopPopup() {
+    document.getElementById("shopPopup").style.display = "none";
+}
+</script>
+{% endblock %}

@@ -1,0 +1,733 @@
+{% extends 'base.html' %}
+
+{% block title %}CyberEscape | Level 5{% endblock %}
+
+{% block content %}
+<style>
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;overflow:auto;font-family:"Segoe UI",Arial,sans-serif;background:#020914;color:white}
+.level5-wrap{min-height:100vh;background:radial-gradient(circle at center,#123047,#020914 75%);padding-bottom:40px}
+
+.intro-screen{position:fixed;inset:0;z-index:900;background:#020914;display:flex;align-items:center;justify-content:center;padding:30px}
+.intro-box{width:1000px;max-width:100%;text-align:center;background:rgba(3,20,35,.96);border:2px solid #00ffc8;border-radius:28px;padding:36px;box-shadow:0 0 40px rgba(0,255,200,.25)}
+.intro-box h1{color:#00ffc8;font-size:42px;margin:0 0 15px}
+.intro-box p{color:#d9faff;line-height:1.7;font-size:17px}
+.guide-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin:26px 0}
+.guide-card{background:rgba(255,255,255,.06);border:1px solid rgba(0,255,200,.3);border-radius:18px;padding:18px;text-align:left}
+.guide-card h3{color:#00ffc8;margin-top:0}
+.game-btn{background:#00ffc8;color:#031014;border:none;padding:13px 20px;border-radius:14px;font-weight:900;cursor:pointer}
+
+.topbar{min-height:92px;display:flex;align-items:center;justify-content:space-between;gap:16px;padding:14px 24px;border-bottom:1px solid rgba(0,255,200,.25);background:rgba(0,10,22,.88)}
+.title-wrap{display:flex;align-items:center;gap:16px}
+.level-badge{padding:12px 24px;border:1px solid #00eaff;border-radius:20px;color:#64f7ff;font-weight:900;font-size:20px}
+.game-title{color:#00ffc8;font-size:30px;font-weight:900;letter-spacing:4px}
+.stats{display:flex;gap:12px;flex-wrap:wrap}
+.stat{min-width:120px;height:62px;border:1px solid rgba(0,234,255,.4);background:rgba(4,25,40,.9);border-radius:18px;display:flex;align-items:center;gap:10px;justify-content:center}
+.stat .icon{font-size:26px}
+.stat span{display:block;font-size:12px;color:#69efff;font-weight:800}
+.stat b{font-size:23px}
+
+.main{display:grid;grid-template-columns:280px 1fr 310px;gap:14px;padding:16px 20px}
+.panel{background:rgba(2,17,31,.9);border:1px solid rgba(0,255,200,.45);border-radius:18px;padding:18px}
+.panel h3{color:#00ffc8;margin:0 0 14px;font-size:22px}
+.panel p{color:#dff8ff;line-height:1.55;font-size:15px}
+.defense-list{display:grid;gap:10px}
+.defense-card{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:14px;padding:12px;cursor:pointer}
+.defense-card.active{border-color:#ffe763;box-shadow:0 0 18px rgba(255,231,99,.25)}
+.defense-card b{color:#00ffc8}
+.defense-card small{display:block;color:#bff8ff;margin-top:5px;line-height:1.4}
+.feedback{background:rgba(255,255,255,.05);border:1px solid rgba(0,255,200,.25);border-radius:16px;padding:14px;min-height:70px;color:#dff8ff}
+.meter-wrap{height:18px;border-radius:20px;background:rgba(255,255,255,.12);overflow:hidden;margin-top:8px}
+.meter-bar{height:100%;width:100%;background:linear-gradient(90deg,#00ff88,#ffd86b,#ff3366);transition:.3s}
+
+.game-area{position:relative;min-height:640px;border-radius:26px;border:1px solid rgba(0,255,200,.28);overflow:hidden;background:linear-gradient(rgba(0,255,200,.08) 1px,transparent 1px),linear-gradient(90deg,rgba(0,255,200,.08) 1px,transparent 1px),radial-gradient(circle at top,#174054,#06131f 65%,#020914);background-size:48px 48px,48px 48px,100% 100%;box-shadow:inset 0 0 50px rgba(0,0,0,.5)}
+.wave-label{position:absolute;left:50%;top:30px;transform:translateX(-50%);color:#00ffc8;border:2px solid #00ffc8;border-radius:14px;padding:10px 36px;font-size:26px;font-weight:900;background:rgba(0,20,20,.8);box-shadow:0 0 18px rgba(0,255,200,.4)}
+.path{position:absolute;left:20px;top:310px;width:calc(100% - 210px);height:54px;border-radius:30px;background:rgba(0,255,200,.08);border:2px dashed rgba(66,255,232,.65)}
+.path::before{content:"ATTACK PATH";position:absolute;left:20px;top:-28px;color:#42ffe8;font-weight:900}
+.server-core{position:absolute;right:45px;top:245px;width:140px;height:150px;border:3px solid #00ffc8;border-radius:22px;background:rgba(0,255,200,.08);display:flex;flex-direction:column;align-items:center;justify-content:center;box-shadow:0 0 25px rgba(0,255,200,.25);z-index:5}
+.server-core .server-icon{font-size:54px}
+.server-core b{color:#00ffc8;margin-top:8px}
+.slot{position:absolute;width:72px;height:72px;border:2px dashed rgba(255,255,255,.25);border-radius:18px;background:rgba(255,255,255,.04);display:flex;align-items:center;justify-content:center;color:#8eefff;font-weight:900;cursor:pointer;z-index:4}
+.slot:hover{border-color:#00ffc8;box-shadow:0 0 18px rgba(0,255,200,.25)}
+.tower{position:absolute;width:72px;height:72px;border-radius:18px;display:flex;align-items:center;justify-content:center;font-size:32px;border:2px solid #00ffc8;background:rgba(0,255,200,.14);box-shadow:0 0 20px rgba(0,255,200,.25);z-index:6;cursor:pointer}
+.tower:hover{border-color:#ffe763;box-shadow:0 0 25px rgba(255,231,99,.35)}
+.tower.flash{animation:towerFlash .2s ease}
+@keyframes towerFlash{from{transform:scale(1.18)}to{transform:scale(1)}}
+.enemy{position:absolute;width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:28px;background:rgba(255,51,102,.18);border:2px solid #ff3366;box-shadow:0 0 18px rgba(255,51,102,.35);z-index:7}
+.enemy .hp{position:absolute;left:4px;right:4px;bottom:-9px;height:5px;background:rgba(255,255,255,.2);border-radius:10px;overflow:hidden}
+.enemy .hp span{display:block;height:100%;width:100%;background:#00ff88}
+.bullet{position:absolute;width:11px;height:11px;border-radius:50%;background:#ffe763;box-shadow:0 0 14px #ffe763;z-index:9;pointer-events:none}
+
+.result-screen{position:fixed;inset:0;z-index:950;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.88)}
+.result-card{width:720px;max-width:100%;background:#071522;border:2px solid #00ffc8;border-radius:24px;padding:34px;text-align:center}
+.result-card h1{color:#00ffc8}
+.result-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin:24px 0}
+.result-box{background:rgba(255,255,255,.06);border-radius:14px;padding:18px}
+.result-box b{font-size:26px;color:#00ffc8}
+.result-actions button{background:#00ffc8;color:#031014;border:none;padding:12px 16px;border-radius:10px;font-weight:bold;margin:5px;cursor:pointer}
+@media(max-width:1200px){.main{grid-template-columns:1fr}}
+
+.threat-preview{
+    position:fixed;
+    inset:0;
+    z-index:9999;
+    display:none;
+    align-items:center;
+    justify-content:center;
+    background:rgba(0,0,0,.78);
+}
+
+.threat-preview-card{
+    width:650px;
+    max-width:90%;
+    background:#071522;
+    border:3px solid #00ffc8;
+    border-radius:28px;
+    padding:35px;
+    text-align:center;
+    box-shadow:0 0 45px rgba(0,255,200,.4);
+}
+
+.threat-preview-card h1{
+    color:#00ffc8;
+    font-size:38px;
+}
+
+.threat-preview-card p{
+    font-size:20px;
+    color:#dff8ff;
+}
+
+.threat-preview-card b{
+    color:#ffe763;
+}
+
+.countdown{
+    font-size:46px;
+    color:#ff3366;
+    font-weight:900;
+}
+</style>
+
+<div class="level5-wrap">
+
+<div class="intro-screen" id="introScreen">
+    <div class="intro-box">
+        <h1>Level 5: Network Defense Mode</h1>
+        <p>The final server is under attack. Place firewalls, IDS systems, antivirus scanners, and honeypots to stop incoming cyberattack waves.</p>
+        <div class="guide-grid">
+            <div class="guide-card"><h3>🔥 Firewall</h3><p>Blocks suspicious traffic and protects the network path.</p></div>
+            <div class="guide-card"><h3>👁 IDS</h3><p>Improves visibility and detects hidden threats.</p></div>
+            <div class="guide-card"><h3>🛡 Antivirus</h3><p>Removes infected malware packets and malicious files.</p></div>
+            <div class="guide-card"><h3>🍯 Honeypot</h3><p>Distracts attackers and slows dangerous traffic.</p></div>
+        </div>
+        <button class="game-btn" onclick="startLevel5()">Start Final Defense</button>
+    </div>
+</div>
+
+<div class="topbar">
+    <div class="title-wrap">
+        <div class="level-badge">LEVEL 5</div>
+        <div class="game-title">NETWORK DEFENSE MODE</div>
+    </div>
+    <div class="stats">
+        <div class="stat"><div class="icon">🌊</div><div><span>WAVE</span><b id="waveText">1</b></div></div>
+        <div class="stat"><div class="icon">⏱</div><div><span>TIME</span><b id="timerText">180</b></div></div>
+        <div class="stat"><div class="icon">⭐</div><div><span>SCORE</span><b id="scoreText">0</b></div></div>
+        <div class="stat"><div class="icon">💡</div><div><span>HINTS USED</span><b id="hintsText">0</b></div></div>
+        <div class="stat"><div class="icon">❤️</div><div><span>SERVER</span><b id="healthText">100%</b></div></div>
+    </div>
+</div>
+
+<div class="main">
+    <div>
+        <div class="panel">
+            <h3>MISSION</h3>
+            <p>Defend the server from incoming cyberattacks.</p>
+            <p style="color:#ffe763;">Use the right defenses based on the attack behavior.</p>
+        </div>
+
+        <div class="panel" style="margin-top:14px;">
+            <h3>DEFENSE TOOLS</h3>
+            <div class="defense-list">
+                <div class="defense-card active" id="card-firewall" onclick="selectDefense('firewall')">
+                    <b>🔥 Firewall</b><small>Filters and blocks suspicious traffic.</small>
+                </div>
+                <div class="defense-card" id="card-ids" onclick="selectDefense('ids')">
+                    <b>👁 IDS</b><small>Detects hidden and suspicious behavior.</small>
+                </div>
+                <div class="defense-card" id="card-antivirus" onclick="selectDefense('antivirus')">
+                    <b>🛡 Antivirus</b><small>Removes infected malware packets.</small>
+                </div>
+                <div class="defense-card" id="card-honeypot" onclick="selectDefense('honeypot')">
+                    <b>🍯 Honeypot</b><small>Distracts and slows attackers.</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="game-area" id="gameArea">
+        <div class="wave-label" id="waveLabel">WAVE 1</div>
+        <div class="path"></div>
+
+        <div class="slot" style="left:16%;top:230px;" onclick="placeDefense(0)">+</div>
+        <div class="slot" style="left:30%;top:385px;" onclick="placeDefense(1)">+</div>
+        <div class="slot" style="left:44%;top:230px;" onclick="placeDefense(2)">+</div>
+        <div class="slot" style="left:58%;top:385px;" onclick="placeDefense(3)">+</div>
+        <div class="slot" style="left:70%;top:230px;" onclick="placeDefense(4)">+</div>
+
+        <div class="server-core">
+            <div class="server-icon">🖥️</div>
+            <b>SERVER CORE</b>
+        </div>
+    </div>
+
+    <div>
+        <div class="panel">
+            <h3>🚨 Incoming Attack</h3>
+            <p>Attack Type: <b id="attackType">Spam Bots</b></p>
+            <p>Threat Behavior: <b id="attackBehavior">Large amounts of unwanted traffic are entering the network.</b></p>
+            <p>Defense Advice: <b id="defenseAdvice">Use a defense that can filter or block suspicious traffic.</b></p>
+            <button class="game-btn" style="width:100%;margin-top:10px;" onclick="startNextWave()">Start Wave</button>
+        </div>
+
+        <div class="panel" style="margin-top:14px;">
+            <h3>💡 Hint</h3>
+            <div class="feedback" id="hintBox">Click Use Hint if you need help.</div>
+            <button class="game-btn" style="width:100%;margin-top:10px;" onclick="useHint()">Use Hint</button>
+        </div>
+
+        <div class="panel" style="margin-top:14px;">
+            <h3>SYSTEM FEEDBACK</h3>
+            <div class="feedback" id="feedbackText">Place defenses and prepare for the attack.</div>
+            <h3 style="margin-top:16px;">Server Health</h3>
+            <div class="meter-wrap"><div class="meter-bar" id="healthBar"></div></div>
+        </div>
+    </div>
+</div>
+</div>
+
+<div class="threat-preview" id="threatPreview">
+    <div class="threat-preview-card">
+        <h1>🚨 Incoming Attack</h1>
+        <p>Attack Type: <b id="previewAttackType">Spam Bots</b></p>
+        <p>Threat Behavior: <b id="previewBehavior">Loading...</b></p>
+        <p>Defense Advice: <b id="previewAdvice">Loading...</b></p>
+        <div class="countdown" id="previewCountdown">10</div>
+    </div>
+</div>
+
+<div class="result-screen" id="resultScreen">
+    <div class="result-card">
+        <h1 id="resultTitle">Network Defended</h1>
+        <p id="resultMessage">You completed Level 5.</p>
+        <div class="result-grid">
+            <div class="result-box">Final Score<br><b id="finalScore">0</b></div>
+            <div class="result-box">Server Health<br><b id="finalHealth">100%</b></div>
+            <div class="result-box">Waves Cleared<br><b id="finalWave">0</b></div>
+            <div class="result-box">Hints Used<br><b id="finalHints">0</b></div>
+            <div class="result-box">Time Used<br><b id="finalTime">0s</b></div>
+        </div>
+        <div class="result-actions">
+            <button onclick="restartGame()">Play Again</button>
+            <button onclick="window.location.href='/dashboard'">Dashboard</button>
+            <button onclick="window.location.href='/certificate'">Certificate</button>
+        </div>
+    </div>
+</div>
+
+<audio id="correctSound" src="{{ url_for('static', filename='audio/correct.mp3') }}"></audio>
+<audio id="wrongSound" src="{{ url_for('static', filename='audio/wrong.mp3') }}"></audio>
+<audio id="completeSound" src="{{ url_for('static', filename='audio/complete.mp3') }}"></audio>
+
+<script>
+const defenseData={
+    firewall:{name:"Firewall",icon:"🔥",range:230,damage:18,rate:45},
+    ids:{name:"IDS",icon:"👁",range:260,damage:14,rate:35},
+    antivirus:{name:"Antivirus",icon:"🛡",range:240,damage:30,rate:55},
+    honeypot:{name:"Honeypot",icon:"🍯",range:220,damage:10,rate:25}
+};
+
+const waves=[
+    {name:"Wave 1: Spam Bots",threat:"Spam Bots",behavior:"Large amounts of unwanted traffic are entering the network.",advice:"Use a defense that can filter or block suspicious traffic.",count:6,icon:"📧",hp:35,speed:1.1,reward:12},
+    {name:"Wave 2: Malware Packets",threat:"Malware Packets",behavior:"Infected packets are trying to reach the server.",advice:"Use a defense that can scan and remove malicious content.",count:8,icon:"🦠",hp:50,speed:1.2,reward:15},
+    {name:"Wave 3: Worm Outbreak",threat:"Worm Outbreak",behavior:"The attack spreads quickly across the network path.",advice:"Balance detection and blocking to slow down spread.",count:9,icon:"🌐",hp:55,speed:1.45,reward:18},
+    {name:"Wave 4: Trojan Infiltrators",threat:"Trojan Infiltrators",behavior:"Some attacks are disguised and harder to notice.",advice:"Improve visibility and detection before they reach the server.",count:10,icon:"🎭",hp:70,speed:1.25,reward:22},
+    {name:"Final Wave: Elite Hacker AI",threat:"Elite Hacker AI",behavior:"A strong mixed attack is targeting the server core.",advice:"Use layered defense. Do not rely on only one type of protection.",count:1,icon:"👾",hp:420,speed:.75,reward:180}
+];
+
+let selectedDefense="firewall";
+let score=0;
+let serverHealth=100;
+let waveIndex=0;
+let enemies=[];
+let towers=[];
+let bullets=[];
+let gameLoop=null;
+let spawnTimer=null;
+let timerInterval=null;
+let waveActive=false;
+let enemiesSpawned=0;
+let hintsUsed=0;
+let timer=180;
+let progressSaved=false;
+let startTime=null;
+
+function playSound(id){
+    const sound=document.getElementById(id);
+    if(sound){
+        sound.currentTime=0;
+        sound.play().catch(()=>{});
+    }
+}
+
+function startLevel5(){
+    document.getElementById("introScreen").style.display="none";
+
+    startTime = Date.now();
+
+    updateThreatIntel();
+    updateUI();
+
+    // Start game engine only
+    gameLoop = requestAnimationFrame(updateGame);
+
+    // Show Wave 1 briefing first
+    showThreatPreview();
+}
+
+function updateThreatIntel(){
+    const wave=waves[waveIndex];
+    if(!wave)return;
+
+    document.getElementById("attackType").textContent=wave.threat;
+    document.getElementById("attackBehavior").textContent=wave.behavior;
+    document.getElementById("defenseAdvice").textContent=wave.advice;
+    document.getElementById("waveLabel").textContent=wave.name;
+}
+
+function selectDefense(type){
+    selectedDefense=type;
+    document.querySelectorAll(".defense-card").forEach(card=>card.classList.remove("active"));
+    document.getElementById("card-"+type).classList.add("active");
+}
+
+function placeDefense(slotIndex){
+    const slotElements=document.querySelectorAll(".slot");
+    const slotEl=slotElements[slotIndex];
+    const data=defenseData[selectedDefense];
+    const area=document.getElementById("gameArea");
+
+    const x=slotEl.offsetLeft;
+    const y=slotEl.offsetTop;
+
+    if(slotEl.dataset.used==="true"){
+        if(waveActive){
+            document.getElementById("feedbackText").textContent="You cannot change defenses during an active wave.";
+            playSound("wrongSound");
+            return;
+        }
+
+        const oldTower=towers.find(t=>t.slotIndex===slotIndex);
+
+        if(oldTower){
+            oldTower.type=selectedDefense;
+            oldTower.name=data.name;
+            oldTower.icon=data.icon;
+            oldTower.range=data.range;
+            oldTower.damage=data.damage;
+            oldTower.rate=data.rate;
+            oldTower.cooldown=0;
+            oldTower.el.textContent=data.icon;
+
+            document.getElementById("feedbackText").textContent="Defense changed to "+data.name+".";
+            playSound("correctSound");
+        }
+
+        return;
+    }
+
+    slotEl.dataset.used="true";
+    slotEl.style.visibility="hidden";
+
+    const tower=document.createElement("div");
+    tower.className="tower";
+    tower.style.left=x+"px";
+    tower.style.top=y+"px";
+    tower.textContent=data.icon;
+    tower.onclick=()=>placeDefense(slotIndex);
+
+    area.appendChild(tower);
+
+    towers.push({
+        slotIndex:slotIndex,
+        type:selectedDefense,
+        x:x+36,
+        y:y+36,
+        cooldown:0,
+        el:tower,
+        ...data
+    });
+
+    document.getElementById("feedbackText").textContent=data.name+" deployed successfully.";
+    playSound("correctSound");
+}
+
+function showThreatPreview(){
+    const wave=waves[waveIndex];
+    if(!wave)return;
+
+    const preview=document.getElementById("threatPreview");
+    let count=10;
+
+    document.getElementById("previewAttackType").textContent=wave.threat;
+    document.getElementById("previewBehavior").textContent=wave.behavior;
+    document.getElementById("previewAdvice").textContent=wave.advice;
+    document.getElementById("previewCountdown").textContent=count;
+
+    preview.style.display="flex";
+
+    const countdown=setInterval(()=>{
+        count--;
+        document.getElementById("previewCountdown").textContent=count;
+
+        if(count<=0){
+    clearInterval(countdown);
+
+    preview.style.display="none";
+
+    updateThreatIntel();
+
+    // Start timer only once (Wave 1)
+    if(!timerInterval){
+        startGameTimer();
+    }
+}
+    },1000);
+}
+
+function startNextWave(){
+    if(waveActive){
+        document.getElementById("feedbackText").textContent="Current wave is still active.";
+        return;
+    }
+
+    if(waveIndex>=waves.length)return;
+
+    waveActive=true;
+    enemiesSpawned=0;
+
+    const wave=waves[waveIndex];
+    document.getElementById("feedbackText").textContent=wave.name+" started. Watch the attack path.";
+
+    spawnTimer=setInterval(()=>{
+        if(enemiesSpawned>=wave.count){
+            clearInterval(spawnTimer);
+            return;
+        }
+
+        spawnEnemy(wave);
+        enemiesSpawned++;
+    },800);
+}
+
+function spawnEnemy(wave){
+    const area=document.getElementById("gameArea");
+
+    const enemy=document.createElement("div");
+    enemy.className="enemy";
+    enemy.style.left="20px";
+    enemy.style.top="313px";
+    enemy.innerHTML=`
+        ${wave.icon}
+        <div class="hp"><span></span></div>
+    `;
+
+    area.appendChild(enemy);
+
+    enemies.push({
+        x:20,
+        y:313,
+        hp:wave.hp,
+        maxHp:wave.hp,
+        speed:wave.speed,
+        reward:wave.reward,
+        el:enemy
+    });
+}
+
+function updateGame(){
+    moveEnemies();
+    towersAttack();
+    moveBullets();
+    checkWaveClear();
+
+    if(serverHealth<=0){
+        finishGame(false,"Server destroyed. The network defense failed.");
+        return;
+    }
+
+    gameLoop=requestAnimationFrame(updateGame);
+}
+
+function moveEnemies(){
+    const area=document.getElementById("gameArea");
+
+    enemies.forEach(enemy=>{
+        enemy.x+=enemy.speed;
+        enemy.el.style.left=enemy.x+"px";
+        enemy.el.style.top=enemy.y+"px";
+
+        if(enemy.x>area.clientWidth-215){
+            serverHealth=Math.max(0,serverHealth-12);
+            enemy.hp=0;
+            enemy.el.remove();
+            playSound("wrongSound");
+            document.getElementById("feedbackText").textContent="Enemy reached the server. Server health decreased.";
+        }
+    });
+
+    enemies=enemies.filter(enemy=>enemy.hp>0);
+}
+
+function towersAttack(){
+    towers.forEach(tower=>{
+        if(tower.cooldown>0){
+            tower.cooldown--;
+            return;
+        }
+
+        let target=null;
+        let bestDistance=999999;
+
+        enemies.forEach(enemy=>{
+            const enemyCenterX=enemy.x+24;
+            const enemyCenterY=enemy.y+24;
+
+            const dx=enemyCenterX-tower.x;
+            const dy=enemyCenterY-tower.y;
+            const distance=Math.sqrt(dx*dx+dy*dy);
+
+            if(distance<tower.range && distance<bestDistance){
+                target=enemy;
+                bestDistance=distance;
+            }
+        });
+
+        if(target){
+            target.hp-=tower.damage;
+
+            const hpBar=target.el.querySelector(".hp span");
+            if(hpBar){
+                hpBar.style.width=Math.max(0,(target.hp/target.maxHp)*100)+"%";
+            }
+
+            tower.cooldown=tower.rate;
+
+            tower.el.classList.add("flash");
+            setTimeout(()=>tower.el.classList.remove("flash"),200);
+
+            createBullet(tower.x,tower.y,target.x+24,target.y+24);
+
+            if(target.hp<=0){
+                score+=target.reward;
+                target.el.remove();
+                playSound("correctSound");
+            }
+        }
+    });
+
+    enemies=enemies.filter(enemy=>enemy.hp>0);
+}
+
+function createBullet(x1,y1,x2,y2){
+    const area=document.getElementById("gameArea");
+
+    const bullet=document.createElement("div");
+    bullet.className="bullet";
+    bullet.style.left=x1+"px";
+    bullet.style.top=y1+"px";
+
+    area.appendChild(bullet);
+
+    bullets.push({
+        x:x1,
+        y:y1,
+        targetX:x2,
+        targetY:y2,
+        life:16,
+        el:bullet
+    });
+}
+
+function moveBullets(){
+    bullets.forEach(bullet=>{
+        bullet.x+=(bullet.targetX-bullet.x)*0.28;
+        bullet.y+=(bullet.targetY-bullet.y)*0.28;
+        bullet.life--;
+
+        bullet.el.style.left=bullet.x+"px";
+        bullet.el.style.top=bullet.y+"px";
+
+        if(bullet.life<=0){
+            bullet.el.remove();
+        }
+    });
+
+    bullets=bullets.filter(bullet=>bullet.life>0);
+}
+
+function startGameTimer(){
+    timerInterval=setInterval(()=>{
+        timer--;
+        document.getElementById("timerText").textContent=timer;
+
+        if(timer<=0){
+            finishGame(false,"Time is over. The server was not defended.");
+        }
+    },1000);
+}
+
+function checkWaveClear(){
+    if(!waveActive)return;
+
+    const wave=waves[waveIndex];
+
+    if(enemiesSpawned>=wave.count && enemies.length===0){
+        waveActive=false;
+        waveIndex++;
+
+        playSound("correctSound");
+
+        if(waveIndex>=waves.length){
+            completeLevel();
+            return;
+        }
+
+        updateThreatIntel();
+document.getElementById("feedbackText").textContent="Wave cleared. Prepare for the next incoming attack.";
+updateUI();
+
+setTimeout(()=>{
+    showThreatPreview();
+},800);
+    }
+}
+
+function useHint(){
+    hintsUsed++;
+
+    const hints=[
+        "Balanced defense is stronger than using only one tool.",
+        "Some attacks spread quickly across networks.",
+        "Certain attacks try to hide themselves.",
+        "Filtering traffic can reduce incoming threats.",
+        "Layered security improves protection.",
+        "After each wave, you can click an existing tower to change it."
+    ];
+
+    document.getElementById("hintBox").textContent=hints[Math.floor(Math.random()*hints.length)];
+    score=Math.max(0,score-5);
+    updateUI();
+}
+
+function updateUI(){
+    document.getElementById("waveText").textContent=Math.min(waveIndex+1,waves.length);
+    document.getElementById("scoreText").textContent=score;
+    document.getElementById("healthText").textContent=serverHealth+"%";
+    document.getElementById("hintsText").textContent=hintsUsed;
+    document.getElementById("healthBar").style.width=serverHealth+"%";
+}
+
+setInterval(updateUI,300);
+
+function completeLevel(){
+    if(progressSaved)return;
+    progressSaved=true;
+
+    cancelAnimationFrame(gameLoop);
+    clearInterval(spawnTimer);
+    clearInterval(timerInterval);
+
+    score+=serverHealth*3;
+    let earnedCoins=Math.floor(score/10);
+
+    playSound("completeSound");
+
+    fetch("/save_level5_progress",{
+        method:"POST",
+        headers:{"Content-Type":"application/json"},
+        body:JSON.stringify({
+            score:score,
+            hints_used:hintsUsed,
+            completion_time:180-timer,
+            coins:earnedCoins
+        })
+    })
+    .then(response=>response.json())
+    .then(data=>{
+        finishGame(
+            true,
+            data.success
+                ?"Excellent work. You defended the network and completed CyberEscape."
+                :"You completed Level 5, but progress could not be saved."
+        );
+
+        if(data.success && data.coins_earned>0){
+            showCoinPopup(data.coins_earned);
+        }
+    })
+    .catch(()=>{
+        finishGame(true,"You completed Level 5, but progress could not be saved.");
+    });
+}
+
+function finishGame(success,message){
+    cancelAnimationFrame(gameLoop);
+    clearInterval(spawnTimer);
+    clearInterval(timerInterval);
+
+    document.getElementById("resultScreen").style.display="flex";
+    document.getElementById("resultTitle").textContent=success?"Network Defended":"Mission Failed";
+    document.getElementById("resultMessage").textContent=message;
+    document.getElementById("finalScore").textContent=score;
+    document.getElementById("finalHealth").textContent=serverHealth+"%";
+    document.getElementById("finalWave").textContent=waveIndex+"/"+waves.length;
+    document.getElementById("finalHints").textContent=hintsUsed;
+    document.getElementById("finalTime").textContent=(180-timer)+"s";
+}
+
+function restartGame(){
+    location.reload();
+}
+
+function showCoinPopup(coinsEarned){
+    let popup=document.getElementById("coinRewardPopup");
+
+    if(!popup){
+        popup=document.createElement("div");
+        popup.id="coinRewardPopup";
+        popup.innerHTML=`
+        <div style="position:fixed;inset:0;background:rgba(0,0,0,.72);display:flex;align-items:center;justify-content:center;z-index:99999;">
+            <div style="width:430px;background:#071522;border:2px solid #ffd86b;border-radius:26px;padding:35px;text-align:center;color:white;">
+                <div style="font-size:46px;">🪙</div>
+                <h2 style="color:#00ffc8;">Cyber Coins Earned!</h2>
+                <p>You received <strong style="color:#ffd86b;font-size:26px;">${coinsEarned}</strong> Cyber Coins.</p>
+                <button onclick="closeCoinPopup()" style="border:none;border-radius:14px;padding:13px 26px;background:#00ffc8;color:#031014;font-weight:900;">Continue</button>
+            </div>
+        </div>`;
+        document.body.appendChild(popup);
+    }
+
+    popup.style.display="block";
+}
+
+function closeCoinPopup(){
+    const popup=document.getElementById("coinRewardPopup");
+    if(popup){
+        popup.style.display="none";
+    }
+}
+</script>
+
+{% endblock %}

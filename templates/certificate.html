@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+
+{% block title %}CyberEscape | Certificate{% endblock %}
+
+{% block content %}
+<section class="certificate-page">
+    <div class="scan-lines"></div>
+    <div class="floating-particles"></div>
+
+    <div class="certificate-shell">
+        <div class="certificate-card">
+            <div class="certificate-top">
+                <div class="certificate-icon">
+                    <i class="fa-solid fa-trophy"></i>
+                </div>
+                <p class="certificate-label">CYBERESCAPE CERTIFICATE OF ACHIEVEMENT</p>
+            </div>
+
+            <h1 class="certificate-title">Certificate of Completion</h1>
+
+            <p class="certificate-text">This certificate is proudly presented to</p>
+
+            <h2 class="certificate-name">{{ username }}</h2>
+
+            <p class="certificate-text">
+                for successfully completing the full CyberEscape cybersecurity awareness journey
+                and finishing all 5 levels of interactive training.
+            </p>
+
+            <div class="certificate-stats">
+                <div class="certificate-stat">
+                    <span>Total Score</span>
+                    <strong>{{ total_score }}</strong>
+                </div>
+                <div class="certificate-stat">
+                    <span>Hints Used</span>
+                    <strong>{{ total_hints }}</strong>
+                </div>
+                <div class="certificate-stat">
+                    <span>Total Attempts</span>
+                    <strong>{{ total_attempts }}</strong>
+                </div>
+                <div class="certificate-stat">
+                    <span>Average Time</span>
+                    <strong>{{ avg_time }}s</strong>
+                </div>
+            </div>
+
+            <div class="certificate-footer">
+                <div class="certificate-footer-item">
+                    <p class="certificate-sign">Awarded for:</p>
+                    <p class="certificate-value">Cybersecurity Awareness Training</p>
+                </div>
+
+                <div class="certificate-footer-item">
+                    <p class="certificate-sign">Date Issued:</p>
+                    <p class="certificate-value">{{ issued_date }}</p>
+                </div>
+
+                <div class="certificate-footer-item">
+                    <p class="certificate-sign">Status:</p>
+                    <p class="certificate-value">Successfully Completed</p>
+                </div>
+            </div>
+
+            <div class="certificate-actions">
+                <a href="/download_certificate" class="certificate-btn">
+                    <i class="fa-solid fa-download"></i> Download Certificate
+                </a>
+
+                <a href="/dashboard" class="certificate-btn">
+                    <i class="fa-solid fa-arrow-left"></i> Back to Dashboard
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

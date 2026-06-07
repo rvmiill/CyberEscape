@@ -1,0 +1,125 @@
+{% extends 'base.html' %}
+
+{% block title %}CyberEscape | Admin Panel{% endblock %}
+
+{% block content %}
+<section class="dashboard-page">
+    <div class="scan-lines"></div>
+    <div class="floating-particles"></div>
+
+    <div class="dashboard-shell">
+        <div class="dashboard-header-card">
+            <div class="player-info">
+                <div class="player-avatar">
+                    <i class="fa-solid fa-user-gear"></i>
+                </div>
+
+                <div class="player-text">
+                    <p class="dashboard-label">ADMIN ACCESS GRANTED</p>
+                    <h1 class="dashboard-title">Admin Dashboard</h1>
+                    <p class="dashboard-subtitle">
+                        Review users, gameplay analytics, progress, attempts, hints used, completion time, and password security status.
+                    </p>
+                </div>
+            </div>
+
+            <div class="header-actions">
+                <a href="{{ url_for('logout') }}" class="logout-btn">
+                    <i class="fa-solid fa-right-from-bracket"></i>
+                    Logout
+                </a>
+            </div>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card"><h3>Total Users</h3><p>{{ total_users }}</p></div>
+            <div class="stat-card"><h3>Completed Users</h3><p>{{ total_completed_users }}</p></div>
+            <div class="stat-card"><h3>Total Score</h3><p>{{ total_score_all }}</p></div>
+            <div class="stat-card"><h3>Total Attempts</h3><p>{{ total_attempts_all }}</p></div>
+            <div class="stat-card"><h3>Total Hints Used</h3><p>{{ total_hints_all }}</p></div>
+            <div class="stat-card"><h3>Average Completion Time</h3><p>{{ avg_completion_time_all }}s</p></div>
+        </div>
+
+        <div class="panel-card" style="margin-top: 28px;">
+            <h3 class="panel-title">Level Completion Analytics</h3>
+            <div class="stats-grid">
+                <div class="stat-card"><h3>Level 1</h3><p>{{ level_completion[1] }}</p></div>
+                <div class="stat-card"><h3>Level 2</h3><p>{{ level_completion[2] }}</p></div>
+                <div class="stat-card"><h3>Level 3</h3><p>{{ level_completion[3] }}</p></div>
+                <div class="stat-card"><h3>Level 4</h3><p>{{ level_completion[4] }}</p></div>
+                <div class="stat-card"><h3>Level 5</h3><p>{{ level_completion[5] }}</p></div>
+            </div>
+        </div>
+
+        <div class="panel-card" style="margin-top: 28px;">
+            <h3 class="panel-title">User Summary</h3>
+            <div style="overflow-x:auto;">
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>Username</th>
+                            <th>Email</th>
+                            <th>Completed Levels</th>
+                            <th>Total Score</th>
+                            <th>Total Hints</th>
+                            <th>Total Attempts</th>
+                            <th>Password Security</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for user in users %}
+                        <tr>
+                            <td>{{ user.username }}</td>
+                            <td>{{ user.email }}</td>
+                            <td>{{ user_summary.get(user.username, {}).get('completed_levels', 0) }}/5</td>
+                            <td>{{ user_summary.get(user.username, {}).get('total_score', 0) }}</td>
+                            <td>{{ user_summary.get(user.username, {}).get('total_hints', 0) }}</td>
+                            <td>{{ user_summary.get(user.username, {}).get('total_attempts', 0) }}</td>
+                            <td>
+                                {% if user.password_hash %}
+                                    <span class="hash-ok">Hashed</span>
+                                {% else %}
+                                    <span class="hash-missing">Not Set</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="panel-card" style="margin-top: 28px;">
+            <h3 class="panel-title">Detailed Progress</h3>
+            <div style="overflow-x:auto;">
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>Username</th>
+                            <th>Level</th>
+                            <th>Status</th>
+                            <th>Score</th>
+                            <th>Hints Used</th>
+                            <th>Attempts</th>
+                            <th>Completion Time</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for row in progress_rows %}
+                        <tr>
+                            <td>{{ row.username }}</td>
+                            <td>{{ row.level_id or '-' }}</td>
+                            <td>{{ row.status or '-' }}</td>
+                            <td>{{ row.score or 0 }}</td>
+                            <td>{{ row.hints_used or 0 }}</td>
+                            <td>{{ row.attempts or 0 }}</td>
+                            <td>{{ (row.completion_time or 0) }}s</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

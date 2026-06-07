@@ -1,0 +1,1270 @@
+{% extends 'base.html' %}
+
+{% block title %}CyberEscape | Dashboard{% endblock %}
+
+{% block content %}
+<style>
+    .dashboard-info-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 18px;
+        margin: 28px 0;
+    }
+
+    .dashboard-info-card {
+        background: rgba(5, 12, 30, 0.92);
+        border: 1px solid rgba(0, 207, 255, 0.35);
+        border-radius: 22px;
+        padding: 24px;
+        box-shadow: 0 0 28px rgba(0, 207, 255, 0.10);
+    }
+
+    .dashboard-info-card h3 {
+        margin: 0 0 14px;
+        color: #00ff88;
+        font-size: 26px;
+    }
+
+    .dashboard-info-card p,
+    .dashboard-info-card li {
+        color: #b8d7e8;
+        line-height: 1.65;
+        font-size: 16px;
+    }
+
+    .dashboard-info-card ul {
+        margin: 0;
+        padding-left: 20px;
+    }
+
+    .xp-rank-card {
+        margin: 28px 0;
+        background: rgba(5, 12, 30, 0.92);
+        border: 1px solid rgba(0, 207, 255, 0.35);
+        border-radius: 22px;
+        padding: 24px;
+        box-shadow: 0 0 28px rgba(0, 207, 255, 0.12);
+    }
+
+    .xp-rank-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 18px;
+        margin-bottom: 18px;
+    }
+
+    .xp-rank-header h2 {
+        margin: 0;
+        color: #00ff88;
+        font-size: 32px;
+    }
+
+    .xp-rank-header p {
+        margin: 6px 0 0;
+        color: #b8d7e8;
+        font-size: 16px;
+    }
+
+    .rank-badge {
+        background: rgba(255, 216, 107, 0.14);
+        border: 1px solid rgba(255, 216, 107, 0.55);
+        color: #ffd86b;
+        padding: 12px 18px;
+        border-radius: 999px;
+        font-weight: 900;
+        white-space: nowrap;
+        box-shadow: 0 0 18px rgba(255, 216, 107, 0.12);
+    }
+
+    .xp-info-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 14px;
+        margin-bottom: 18px;
+    }
+
+    .xp-info-box {
+        background: rgba(255, 255, 255, 0.06);
+        border: 1px solid rgba(255, 255, 255, 0.10);
+        border-radius: 16px;
+        padding: 16px;
+    }
+
+    .xp-info-box span {
+        display: block;
+        color: #b8d7e8;
+        margin-bottom: 6px;
+    }
+
+    .xp-info-box strong {
+        color: #ffffff;
+        font-size: 24px;
+    }
+
+    .xp-progress-wrap {
+        background: rgba(255, 255, 255, 0.08);
+        border-radius: 999px;
+        overflow: hidden;
+        height: 22px;
+        border: 1px solid rgba(0, 207, 255, 0.25);
+    }
+
+    .xp-progress-bar {
+        height: 100%;
+        width: {{ rank_progress }}%;
+        background: linear-gradient(135deg, #00ff88, #00cfff);
+        box-shadow: 0 0 18px rgba(0, 207, 255, 0.35);
+        transition: width 0.5s ease;
+    }
+
+    .xp-progress-text {
+        margin-top: 10px;
+        color: #b8d7e8;
+        font-size: 14px;
+    }
+
+    .story-map-section {
+        margin: 28px 0;
+        background: rgba(5, 12, 30, 0.92);
+        border: 1px solid rgba(0, 207, 255, 0.35);
+        border-radius: 22px;
+        padding: 24px;
+        box-shadow: 0 0 28px rgba(0, 207, 255, 0.12);
+        overflow: visible;
+    }
+
+    .story-map-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 16px;
+        margin-bottom: 24px;
+    }
+
+    .story-map-header h2 {
+        margin: 0;
+        color: #00ff88;
+        font-size: 34px;
+    }
+
+    .story-map-header p {
+        margin: 8px 0 0;
+        color: #b8d7e8;
+        font-size: 16px;
+    }
+
+    .journey-progress-pill {
+        background: rgba(0, 207, 255, 0.12);
+        border: 1px solid rgba(0, 207, 255, 0.45);
+        color: #00cfff;
+        padding: 10px 16px;
+        border-radius: 999px;
+        font-weight: 700;
+        white-space: nowrap;
+    }
+
+    .story-map-track {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 18px;
+        position: relative;
+        overflow: visible;
+        padding-bottom: 0;
+    }
+
+    .story-map-node {
+        position: relative;
+        background: rgba(255, 255, 255, 0.06);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        border-radius: 22px;
+        padding: 24px;
+        min-height: 330px;
+        transition: 0.25s ease;
+    }
+
+    .story-map-node.completed {
+        border-color: rgba(34, 197, 94, 0.65);
+        box-shadow: 0 0 22px rgba(34, 197, 94, 0.16);
+    }
+
+    .story-map-node.unlocked {
+        border-color: rgba(0, 207, 255, 0.65);
+        box-shadow: 0 0 22px rgba(0, 207, 255, 0.16);
+    }
+
+    .story-map-node.locked {
+        opacity: 0.62;
+        filter: grayscale(0.35);
+    }
+
+    .story-map-node.certificate-node {
+        border-color: rgba(255, 216, 107, 0.45);
+    }
+
+    .story-map-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 14px;
+        margin-bottom: 18px;
+    }
+
+    .story-map-icon {
+        width: 74px;
+        height: 74px;
+        border-radius: 18px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(0, 207, 255, 0.12);
+        color: #00cfff;
+        font-size: 30px;
+        border: 1px solid rgba(0, 207, 255, 0.35);
+        flex-shrink: 0;
+    }
+
+    .story-map-node.completed .story-map-icon {
+        background: rgba(34, 197, 94, 0.16);
+        border-color: rgba(34, 197, 94, 0.55);
+        color: #86efac;
+    }
+
+    .story-map-node.locked .story-map-icon {
+        background: rgba(148, 163, 184, 0.12);
+        border-color: rgba(148, 163, 184, 0.3);
+        color: #94a3b8;
+    }
+
+    .story-map-node.certificate-node .story-map-icon {
+        background: rgba(255, 216, 107, 0.14);
+        border-color: rgba(255, 216, 107, 0.55);
+        color: #ffd86b;
+    }
+
+    .story-map-node h3 {
+        margin: 0 0 14px;
+        color: #ffffff;
+        font-size: 24px;
+        line-height: 1.35;
+    }
+
+    .story-status {
+        display: inline-block;
+        padding: 7px 14px;
+        border-radius: 999px;
+        font-size: 13px;
+        font-weight: 800;
+        text-transform: uppercase;
+        white-space: nowrap;
+    }
+
+    .story-status.completed {
+        color: #86efac;
+        background: rgba(34, 197, 94, 0.12);
+        border: 1px solid rgba(34, 197, 94, 0.45);
+    }
+
+    .story-status.unlocked {
+        color: #7dd3fc;
+        background: rgba(14, 165, 233, 0.12);
+        border: 1px solid rgba(14, 165, 233, 0.45);
+    }
+
+    .story-status.locked {
+        color: #cbd5e1;
+        background: rgba(148, 163, 184, 0.12);
+        border: 1px solid rgba(148, 163, 184, 0.35);
+    }
+
+    .story-map-stats {
+        margin: 18px 0;
+        color: #b8d7e8;
+        font-size: 16px;
+        line-height: 1.9;
+    }
+
+    .story-map-stats p {
+        margin: 4px 0;
+    }
+
+    .story-map-stats strong {
+        color: #ffffff;
+        font-weight: 800;
+    }
+
+    .story-map-btn {
+        display: inline-block;
+        margin-top: 6px;
+        text-decoration: none;
+        padding: 13px 20px;
+        border-radius: 12px;
+        background: linear-gradient(135deg, #00ff88, #00cfff);
+        color: #031126;
+        font-size: 16px;
+        font-weight: 900;
+    }
+
+    .story-map-btn.replay {
+        background: linear-gradient(135deg, #22c55e, #00cfff);
+        color: #031126;
+    }
+
+    .story-map-btn.locked {
+        background: #475569;
+        color: #cbd5e1;
+        pointer-events: none;
+    }
+
+    .story-map-btn.certificate {
+        background: #ffd86b;
+        color: #031126;
+    }
+
+    .certificate-node p {
+        color: #b8d7e8;
+        line-height: 1.6;
+    }
+
+    .badges-section {
+        margin-top: 28px;
+        background: rgba(5, 12, 30, 0.92);
+        border: 1px solid rgba(0, 207, 255, 0.35);
+        border-radius: 22px;
+        padding: 24px;
+        box-shadow: 0 0 28px rgba(0, 207, 255, 0.10);
+    }
+
+    .badges-section .section-head {
+        margin-bottom: 20px;
+    }
+
+    .badges-section .section-title {
+        margin: 0 0 8px;
+        color: #00ff88;
+        font-size: 34px;
+    }
+
+    .badges-section .section-text {
+        margin: 0;
+        color: #b8d7e8;
+        font-size: 16px;
+    }
+
+    .badges-grid {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 14px;
+        justify-content: flex-start;
+        align-items: stretch;
+    }
+
+    .badge-card {
+        width: 220px;
+        min-height: 170px;
+        background: rgba(255, 255, 255, 0.06);
+        border: 1px solid rgba(0, 207, 255, 0.25);
+        border-radius: 18px;
+        padding: 18px;
+        text-align: center;
+        box-shadow: 0 0 18px rgba(0, 207, 255, 0.08);
+    }
+
+    .badge-icon {
+        width: 58px;
+        height: 58px;
+        margin: 0 auto 14px;
+        border-radius: 16px;
+        background: rgba(0, 207, 255, 0.12);
+        border: 1px solid rgba(0, 207, 255, 0.35);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #ffd86b;
+        font-size: 24px;
+    }
+
+    .badge-card h3 {
+        margin: 0 0 8px;
+        color: #ffffff;
+        font-size: 18px;
+    }
+
+    .badge-card p {
+        margin: 0;
+        color: #b8d7e8;
+        font-size: 14px;
+    }
+
+    .achievement-popup {
+        position: fixed;
+        right: 28px;
+        bottom: 28px;
+        width: 360px;
+        max-width: calc(100% - 40px);
+        background:
+            radial-gradient(circle at top left, rgba(255, 216, 107, 0.18), transparent 40%),
+            rgba(5, 12, 30, 0.98);
+        border: 2px solid rgba(255, 216, 107, 0.75);
+        border-radius: 22px;
+        padding: 20px;
+        box-shadow: 0 0 35px rgba(255, 216, 107, 0.25);
+        z-index: 9999;
+        display: none;
+        transform: translateY(30px);
+        opacity: 0;
+    }
+
+    .achievement-popup.show {
+        display: block;
+        animation: achievementSlideIn 0.45s ease forwards;
+    }
+
+    .achievement-popup.hide {
+        animation: achievementSlideOut 0.35s ease forwards;
+    }
+
+    @keyframes achievementSlideIn {
+        from {
+            transform: translateY(40px) scale(0.92);
+            opacity: 0;
+        }
+        to {
+            transform: translateY(0) scale(1);
+            opacity: 1;
+        }
+    }
+
+    @keyframes achievementSlideOut {
+        from {
+            transform: translateY(0) scale(1);
+            opacity: 1;
+        }
+        to {
+            transform: translateY(40px) scale(0.92);
+            opacity: 0;
+        }
+    }
+
+    .achievement-popup-top {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+    }
+
+    .achievement-popup-icon {
+        width: 62px;
+        height: 62px;
+        border-radius: 18px;
+        background: rgba(255, 216, 107, 0.14);
+        border: 1px solid rgba(255, 216, 107, 0.55);
+        color: #ffd86b;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 28px;
+        flex-shrink: 0;
+    }
+
+    .achievement-popup-text small {
+        display: block;
+        color: #00ff88;
+        font-weight: 900;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-bottom: 4px;
+    }
+
+    .achievement-popup-text h3 {
+        margin: 0;
+        color: #ffffff;
+        font-size: 22px;
+    }
+
+    .achievement-popup-text p {
+        margin: 6px 0 0;
+        color: #b8d7e8;
+        line-height: 1.4;
+    }
+
+    .achievement-close {
+        position: absolute;
+        top: 10px;
+        right: 12px;
+        background: transparent;
+        border: none;
+        color: #b8d7e8;
+        font-size: 22px;
+        cursor: pointer;
+    }
+
+    .achievement-glow {
+        animation: badgeGlow 1.2s ease-in-out 2;
+    }
+
+    @keyframes badgeGlow {
+        0%, 100% {
+            box-shadow: 0 0 18px rgba(0, 207, 255, 0.08);
+            transform: scale(1);
+        }
+        50% {
+            box-shadow: 0 0 28px rgba(255, 216, 107, 0.38);
+            transform: scale(1.03);
+        }
+    }
+
+    @media (max-width: 1100px) {
+        .dashboard-info-grid,
+        .story-map-track,
+        .xp-info-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .story-map-header,
+        .xp-rank-header {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .badge-card {
+            width: calc(50% - 7px);
+        }
+    }
+
+    @media (max-width: 650px) {
+        .badge-card {
+            width: 100%;
+        }
+
+        .achievement-popup {
+            right: 20px;
+            bottom: 20px;
+        }
+    }
+    
+    .dashboard-reward-widget {
+        position: fixed;
+        right: 28px;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 280px;
+        background: rgba(5, 12, 30, 0.96);
+        border: 2px solid rgba(255, 216, 107, 0.75);
+        border-radius: 22px;
+        padding: 18px;
+        z-index: 999;
+        box-shadow: 0 0 35px rgba(255, 216, 107, 0.22);
+    }
+    .dashboard-reward-widget h3 {
+        margin: 0 0 14px;
+        color: #ffd86b;
+        font-size: 20px;
+    }
+    .dashboard-reward-item {
+        background: rgba(255, 255, 255, 0.07);
+        border: 1px solid rgba(0, 207, 255, 0.25);
+        border-radius: 14px;
+        padding: 12px;
+        margin-bottom: 10px;
+        color: #ffffff;
+    }
+    .dashboard-reward-item i {
+        color: #00cfff;
+        margin-right: 8px;
+    }
+    .dashboard-reward-item strong {
+        color: #00ff88;
+    }
+    .neon-theme-active {
+    background:
+        radial-gradient(circle at top left, rgba(0, 255, 136, 0.22), transparent 28%),
+        radial-gradient(circle at top right, rgba(0, 207, 255, 0.20), transparent 30%),
+        radial-gradient(circle at bottom, rgba(255, 216, 107, 0.12), transparent 35%),
+        linear-gradient(135deg, #020617, #001f2e, #031126) !important;
+}
+
+.neon-theme-active .floating-particles {
+    opacity: 1;
+    filter: drop-shadow(0 0 8px #00ff88);
+}
+
+.neon-theme-active .dashboard-header-card,
+.neon-theme-active .stat-panel,
+.neon-theme-active .xp-rank-card,
+.neon-theme-active .dashboard-info-card,
+.neon-theme-active .story-map-section,
+.neon-theme-active .badges-section {
+    background:
+        radial-gradient(circle at top left, rgba(0, 255, 136, 0.12), transparent 40%),
+        rgba(3, 17, 38, 0.94);
+    border-color: rgba(0, 255, 136, 0.65);
+    box-shadow:
+        0 0 25px rgba(0, 255, 136, 0.25),
+        0 0 45px rgba(0, 207, 255, 0.16);
+}
+    .theme-switch {
+    display: inline-block;
+    position: relative;
+    width: 62px;
+    height: 32px;
+    margin-top: 12px;
+}
+
+.theme-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.theme-slider {
+    position: absolute;
+    cursor: pointer;
+    inset: 0;
+    background: #475569;
+    border-radius: 999px;
+    transition: 0.25s;
+}
+
+.theme-slider::before {
+    content: "";
+    position: absolute;
+    width: 24px;
+    height: 24px;
+    left: 4px;
+    top: 4px;
+    background: white;
+    border-radius: 50%;
+    transition: 0.25s;
+}
+
+.theme-switch input:checked + .theme-slider {
+    background: linear-gradient(135deg, #00ff88, #00cfff);
+}
+
+.theme-switch input:checked + .theme-slider::before {
+    transform: translateX(30px);
+}
+    .champion-title {
+        display: inline-block;
+        margin-top: 8px;
+        padding: 8px 14px;
+        border-radius: 999px;
+        background: rgba(255, 216, 107, 0.14);
+        border: 1px solid rgba(255, 216, 107, 0.65);
+        color: #ffd86b;
+        font-weight: 900;
+    }
+
+</style>
+
+<section class="dashboard-page {% if user_rewards.get('neon_dashboard_theme', 0) > 0 %}neon-theme-active{% endif %}">
+    <div class="scan-lines"></div>
+    <div class="floating-particles"></div>
+
+    <div class="dashboard-shell">
+
+        {% if user_rewards.get('neon_dashboard_theme', 0) > 0 or user_rewards.get('champion_title_badge', 0) > 0 %}
+        <div class="dashboard-reward-widget">
+            <h3><i class="fa-solid fa-gift"></i> Active Rewards</h3>
+    
+            {% if user_rewards.get('neon_dashboard_theme', 0) > 0 %}
+            <div class="dashboard-reward-item">
+                <i class="fa-solid fa-palette"></i>
+                <strong>Neon Dashboard Theme</strong>
+                <label class="theme-switch">
+                    <input type="checkbox" id="neonThemeSwitch" onchange="toggleNeonThemeSwitch()">
+                    <span class="theme-slider"></span>
+                </label>
+            </div>
+            {% endif %}
+            
+            {% if user_rewards.get('champion_title_badge', 0) > 0 %}
+            <div class="dashboard-reward-item">
+                <i class="fa-solid fa-crown"></i>
+                <strong>Champion Title Badge</strong>
+                <p>Champion title displayed on dashboard.</p>
+            </div>
+            {% endif %}
+        </div>
+        {% endif %}
+
+        {% if all_completed %}
+        <div class="dashboard-complete-banner">
+            <div class="complete-badge">
+                <i class="fa-solid fa-trophy"></i>
+            </div>
+            <div class="complete-content">
+                <h2>Mission Completed</h2>
+                <p>
+                    Congratulations, {{ username }}. You completed all 5 CyberEscape levels and finished the full cybersecurity training journey.
+                </p>
+            </div>
+            <div class="complete-actions">
+                <a href="{{ url_for('certificate') }}" class="certificate-btn">View Certificate</a>
+            </div>
+        </div>
+        {% endif %}
+
+        <div class="dashboard-header-card">
+            <div class="player-info">
+                <div class="player-avatar">
+                    <i class="fa-solid fa-user-shield"></i>
+                </div>
+
+                <div class="player-text">
+                    <p class="dashboard-label">
+                        {% if is_admin %}
+                            ADMIN / PLAYER ACCESS GRANTED
+                        {% else %}
+                            PLAYER ACCESS GRANTED
+                        {% endif %}
+                    </p>
+                    <h1 class="dashboard-title">
+                        Welcome, <span class="blue-glow">{{ username }}</span>
+                    </h1>
+
+                    {% if user_rewards.get('champion_title_badge', 0) > 0 %}
+                    <div class="champion-title">
+                        <i class="fa-solid fa-crown"></i>
+                        CyberEscape Champion
+                    </div>
+                    {% endif %}
+                    
+                    <p class="dashboard-subtitle">
+                        Enter the mission control center and continue your cybersecurity training journey.
+                    </p>
+                </div>
+            </div>
+
+            <div class="header-actions">
+                {% if is_admin %}
+                <a href="{{ url_for('admin') }}" class="logout-btn">
+                    <i class="fa-solid fa-user-gear"></i>
+                    Admin Page
+                </a>
+                {% endif %}
+                
+                <a href="{{ url_for('reward_shop') }}" class="logout-btn">
+                    <i class="fa-solid fa-store"></i>
+                    Reward Shop
+                </a>
+
+                <a href="{{ url_for('leaderboard') }}" class="logout-btn">
+                    <i class="fa-solid fa-ranking-star"></i>
+                    Leaderboard
+                </a>
+                
+                <a href="{{ url_for('logout') }}" class="logout-btn">
+                    <i class="fa-solid fa-right-from-bracket"></i>
+                    Logout
+                </a>
+            </div>
+        </div>
+
+        <div class="dashboard-stats-grid">
+            <div class="stat-panel">
+                <div class="stat-icon"><i class="fa-solid fa-gamepad"></i></div>
+                <div>
+                    <p class="stat-label">Total Levels</p>
+                    <h3 class="stat-value">5</h3>
+                </div>
+            </div>
+
+            <div class="stat-panel">
+                <div class="stat-icon"><i class="fa-solid fa-trophy"></i></div>
+                <div>
+                    <p class="stat-label">Completed</p>
+                    <h3 class="stat-value">{{ completed_count }} / 5</h3>
+                </div>
+            </div>
+
+            <div class="stat-panel">
+                <div class="stat-icon"><i class="fa-solid fa-chart-line"></i></div>
+                <div>
+                    <p class="stat-label">Progress</p>
+                    <h3 class="stat-value">{{ progress_percent }}%</h3>
+                </div>
+            </div>
+
+            <div class="stat-panel">
+                <div class="stat-icon"><i class="fa-solid fa-coins"></i></div>
+                <div>
+                    <p class="stat-label">Cyber Coins</p>
+                    <h3 class="stat-value">{{ coins }}</h3>
+                </div>
+            </div>
+
+            <div class="stat-panel">
+                <div class="stat-icon"><i class="fa-solid fa-shield-halved"></i></div>
+                <div>
+                    <p class="stat-label">Training Status</p>
+                    <h3 class="stat-value">
+                        {% if completed_count == 0 %}
+                            Beginner
+                        {% elif completed_count < 5 %}
+                            In Progress
+                        {% else %}
+                            Completed
+                        {% endif %}
+                    </h3>
+                </div>
+            </div>
+        </div>
+
+        <div class="dashboard-stats-grid analytics-grid">
+            <div class="stat-panel">
+                <div class="stat-icon"><i class="fa-solid fa-star"></i></div>
+                <div>
+                    <p class="stat-label">Total Score</p>
+                    <h3 class="stat-value">{{ total_score }}</h3>
+                </div>
+            </div>
+
+            <div class="stat-panel">
+                <div class="stat-icon"><i class="fa-solid fa-lightbulb"></i></div>
+                <div>
+                    <p class="stat-label">Hints Used</p>
+                    <h3 class="stat-value">{{ total_hints_used }}</h3>
+                </div>
+            </div>
+
+            <div class="stat-panel">
+                <div class="stat-icon"><i class="fa-solid fa-rotate-right"></i></div>
+                <div>
+                    <p class="stat-label">Total Attempts</p>
+                    <h3 class="stat-value">{{ total_attempts }}</h3>
+                </div>
+            </div>
+
+            <div class="stat-panel">
+                <div class="stat-icon"><i class="fa-solid fa-clock"></i></div>
+                <div>
+                    <p class="stat-label">Avg Time</p>
+                    <h3 class="stat-value">{{ average_completion_time }}s</h3>
+                </div>
+            </div>
+        </div>
+
+        <div class="xp-rank-card">
+            <div class="xp-rank-header">
+                <div>
+                    <h2>Player XP and Rank</h2>
+                    <p>Your rank increases based on score, completed levels, speed, and fewer hints.</p>
+                </div>
+
+                <div class="rank-badge">
+                    {{ player_rank }}
+                </div>
+            </div>
+
+            <div class="xp-info-grid">
+                <div class="xp-info-box">
+                    <span>Total XP</span>
+                    <strong>{{ xp }}</strong>
+                </div>
+
+                <div class="xp-info-box">
+                    <span>Current Rank</span>
+                    <strong>{{ player_rank }}</strong>
+                </div>
+
+                <div class="xp-info-box">
+                    <span>Next Rank</span>
+                    <strong>{{ next_rank }}</strong>
+                </div>
+            </div>
+
+            <div class="xp-progress-wrap">
+                <div class="xp-progress-bar"></div>
+            </div>
+
+            <div class="xp-progress-text">
+                Progress to next rank: {{ rank_progress }}%
+                {% if next_rank != "Max Rank" %}
+                    — {{ xp }} / {{ next_rank_xp }} XP
+                {% else %}
+                    — Maximum rank reached
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="dashboard-info-grid">
+            <div class="dashboard-info-card">
+                <h3>Mission Brief</h3>
+                <p>
+                    CyberEscape helps students learn passwords, phishing, malware, encryption,
+                    and network defense in a fun and practical way.
+                </p>
+            </div>
+
+            <div class="dashboard-info-card">
+                <h3>Objective</h3>
+                <ul>
+                    <li>Improve cyber awareness</li>
+                    <li>Make better online decisions</li>
+                    <li>Complete all 5 missions</li>
+                    <li>Build safer digital habits</li>
+                </ul>
+            </div>
+
+            <div class="dashboard-info-card">
+                <h3>Progress Info</h3>
+                <p>
+                    Complete one level to unlock the next mission. Your best score, hints, attempts,
+                    time, and Cyber Coins are saved automatically.
+                </p>
+            </div>
+        </div>
+
+        <div class="story-map-section">
+            <div class="story-map-header">
+                <div>
+                    <h2>CyberEscape Journey Map</h2>
+                    <p>Choose a level to learn about real cybersecurity threats through gameplay.</p>
+                </div>
+                <div class="journey-progress-pill">
+                    Journey Progress: {{ completed_count }} / 5
+                </div>
+            </div>
+
+            <div class="story-map-track">
+
+                <div class="story-map-node {% if level1.status == 'completed' %}completed{% elif level1.status != 'locked' %}unlocked{% else %}locked{% endif %}">
+                    <div class="story-map-top">
+                        <div class="story-map-icon">
+                            <i class="fa-solid fa-lock"></i>
+                        </div>
+                        <span class="story-status {% if level1.status == 'completed' %}completed{% elif level1.status != 'locked' %}unlocked{% else %}locked{% endif %}">
+                            {{ level1.status|capitalize }}
+                        </span>
+                    </div>
+
+                    <h3>Level 1: Password Fortress</h3>
+
+                    <div class="story-map-stats">
+                        <p>Score: <strong>{{ level1.score }}</strong></p>
+                        <p>Attempts: <strong>{{ level1.attempts }}</strong></p>
+                        <p>Hints: <strong>{{ level1.hints_used }}</strong></p>
+                        <p>Time: <strong>{{ level1.completion_time }}s</strong></p>
+                    </div>
+
+                    <a href="{{ url_for('level1') }}" class="story-map-btn {% if level1.status == 'completed' %}replay{% endif %}">
+                        {% if level1.status == 'completed' %}Replay Level{% else %}Enter Level{% endif %}
+                    </a>
+                </div>
+
+                <div class="story-map-node {% if level2.status == 'completed' %}completed{% elif level2.status != 'locked' %}unlocked{% else %}locked{% endif %}">
+                    <div class="story-map-top">
+                        <div class="story-map-icon">
+                            <i class="fa-solid fa-envelope-open-text"></i>
+                        </div>
+                        <span class="story-status {% if level2.status == 'completed' %}completed{% elif level2.status != 'locked' %}unlocked{% else %}locked{% endif %}">
+                            {{ level2.status|capitalize }}
+                        </span>
+                    </div>
+
+                    <h3>Level 2: Phishing Pond</h3>
+
+                    <div class="story-map-stats">
+                        <p>Score: <strong>{{ level2.score }}</strong></p>
+                        <p>Attempts: <strong>{{ level2.attempts }}</strong></p>
+                        <p>Hints: <strong>{{ level2.hints_used }}</strong></p>
+                        <p>Time: <strong>{{ level2.completion_time }}s</strong></p>
+                    </div>
+
+                    <a href="{% if level2.status == 'locked' %}#{% else %}{{ url_for('level2') }}{% endif %}"
+                       class="story-map-btn {% if level2.status == 'completed' %}replay{% elif level2.status == 'locked' %}locked{% endif %}">
+                        {% if level2.status == 'completed' %}Replay Level{% elif level2.status == 'locked' %}Locked{% else %}Enter Level{% endif %}
+                    </a>
+                </div>
+
+                <div class="story-map-node {% if level3.status == 'completed' %}completed{% elif level3.status != 'locked' %}unlocked{% else %}locked{% endif %}">
+                    <div class="story-map-top">
+                        <div class="story-map-icon">
+                            <i class="fa-solid fa-bug"></i>
+                        </div>
+                        <span class="story-status {% if level3.status == 'completed' %}completed{% elif level3.status != 'locked' %}unlocked{% else %}locked{% endif %}">
+                            {{ level3.status|capitalize }}
+                        </span>
+                    </div>
+
+                    <h3>Level 3: Malware Maze</h3>
+
+                    <div class="story-map-stats">
+                        <p>Score: <strong>{{ level3.score }}</strong></p>
+                        <p>Attempts: <strong>{{ level3.attempts }}</strong></p>
+                        <p>Hints: <strong>{{ level3.hints_used }}</strong></p>
+                        <p>Time: <strong>{{ level3.completion_time }}s</strong></p>
+                    </div>
+
+                    <a href="{% if level3.status == 'locked' %}#{% else %}{{ url_for('level3') }}{% endif %}"
+                       class="story-map-btn {% if level3.status == 'completed' %}replay{% elif level3.status == 'locked' %}locked{% endif %}">
+                        {% if level3.status == 'completed' %}Replay Level{% elif level3.status == 'locked' %}Locked{% else %}Enter Level{% endif %}
+                    </a>
+                </div>
+
+                <div class="story-map-node {% if level4.status == 'completed' %}completed{% elif level4.status != 'locked' %}unlocked{% else %}locked{% endif %}">
+                    <div class="story-map-top">
+                        <div class="story-map-icon">
+                            <i class="fa-solid fa-key"></i>
+                        </div>
+                        <span class="story-status {% if level4.status == 'completed' %}completed{% elif level4.status != 'locked' %}unlocked{% else %}locked{% endif %}">
+                            {{ level4.status|capitalize }}
+                        </span>
+                    </div>
+
+                    <h3>Level 4: Chamber of Encryptions</h3>
+
+                    <div class="story-map-stats">
+                        <p>Score: <strong>{{ level4.score }}</strong></p>
+                        <p>Attempts: <strong>{{ level4.attempts }}</strong></p>
+                        <p>Hints: <strong>{{ level4.hints_used }}</strong></p>
+                        <p>Time: <strong>{{ level4.completion_time }}s</strong></p>
+                    </div>
+
+                    <a href="{% if level4.status == 'locked' %}#{% else %}{{ url_for('level4') }}{% endif %}"
+                       class="story-map-btn {% if level4.status == 'completed' %}replay{% elif level4.status == 'locked' %}locked{% endif %}">
+                        {% if level4.status == 'completed' %}Replay Level{% elif level4.status == 'locked' %}Locked{% else %}Enter Level{% endif %}
+                    </a>
+                </div>
+
+                <div class="story-map-node {% if level5.status == 'completed' %}completed{% elif level5.status != 'locked' %}unlocked{% else %}locked{% endif %}">
+                    <div class="story-map-top">
+                        <div class="story-map-icon">
+                            <i class="fa-solid fa-network-wired"></i>
+                        </div>
+                        <span class="story-status {% if level5.status == 'completed' %}completed{% elif level5.status != 'locked' %}unlocked{% else %}locked{% endif %}">
+                            {{ level5.status|capitalize }}
+                        </span>
+                    </div>
+
+                    <h3>Level 5: Firewall Ultimatum</h3>
+
+                    <div class="story-map-stats">
+                        <p>Score: <strong>{{ level5.score }}</strong></p>
+                        <p>Attempts: <strong>{{ level5.attempts }}</strong></p>
+                        <p>Hints: <strong>{{ level5.hints_used }}</strong></p>
+                        <p>Time: <strong>{{ level5.completion_time }}s</strong></p>
+                    </div>
+
+                    <a href="{% if level5.status == 'locked' %}#{% else %}{{ url_for('level5') }}{% endif %}"
+                       class="story-map-btn {% if level5.status == 'completed' %}replay{% elif level5.status == 'locked' %}locked{% endif %}">
+                        {% if level5.status == 'completed' %}Replay Level{% elif level5.status == 'locked' %}Locked{% else %}Enter Level{% endif %}
+                    </a>
+                </div>
+
+                <div class="story-map-node certificate-node {% if all_completed %}completed{% else %}locked{% endif %}">
+                    <div class="story-map-top">
+                        <div class="story-map-icon">
+                            <i class="fa-solid fa-certificate"></i>
+                        </div>
+                        <span class="story-status {% if all_completed %}completed{% else %}locked{% endif %}">
+                            {% if all_completed %}Unlocked{% else %}Locked{% endif %}
+                        </span>
+                    </div>
+
+                    <h3>Final Reward: Certificate</h3>
+                    <p>
+                        Complete all 5 CyberEscape missions to unlock your certificate of achievement.
+                    </p>
+
+                    <div class="story-map-stats">
+                        <p>Total Score: <strong>{{ total_score }}</strong></p>
+                        <p>Completed: <strong>{{ completed_count }}/5</strong></p>
+                        <p>Hints: <strong>{{ total_hints_used }}</strong></p>
+                        <p>Attempts: <strong>{{ total_attempts }}</strong></p>
+                    </div>
+
+                    <a href="{% if all_completed %}{{ url_for('certificate') }}{% else %}#{% endif %}"
+                       class="story-map-btn certificate {% if not all_completed %}locked{% endif %}">
+                        {% if all_completed %}View Certificate{% else %}Locked{% endif %}
+                    </a>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="badges-section">
+            <div class="section-head">
+                <h2 class="section-title">Achievements</h2>
+                <p class="section-text">
+                    Earn badges by completing missions and mastering your cybersecurity skills.
+                </p>
+            </div>
+
+            <div class="badges-grid" id="badgesGrid">
+                {% if badges %}
+                    {% for badge in badges %}
+                    <div class="badge-card" data-badge-name="{{ badge.name }}">
+                        <div class="badge-icon">
+                            <i class="fa-solid {{ badge.icon }}"></i>
+                        </div>
+                        <h3>{{ badge.name }}</h3>
+                        <p>{{ badge.desc }}</p>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="badge-card empty-badge-card">
+                        <div class="badge-icon">
+                            <i class="fa-solid fa-medal"></i>
+                        </div>
+                        <h3>No Badges Yet</h3>
+                        <p>Complete missions to unlock your achievements.</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+    </div>
+</section>
+
+<div class="achievement-popup" id="achievementPopup">
+    <button class="achievement-close" onclick="closeAchievementPopup()">×</button>
+
+    <div class="achievement-popup-top">
+        <div class="achievement-popup-icon" id="achievementPopupIcon">
+            <i class="fa-solid fa-trophy"></i>
+        </div>
+
+        <div class="achievement-popup-text">
+            <small>Achievement Unlocked</small>
+            <h3 id="achievementPopupTitle">Badge Name</h3>
+            <p id="achievementPopupDesc">Badge description</p>
+        </div>
+    </div>
+</div>
+
+<script>
+    const currentBadges = [
+        {% for badge in badges %}
+        {
+            name: {{ badge.name|tojson }},
+            desc: {{ badge.desc|tojson }},
+            icon: {{ badge.icon|tojson }}
+        }{% if not loop.last %},{% endif %}
+        {% endfor %}
+    ];
+
+    const achievementStorageKey = "cyberescape_seen_badges_{{ username }}";
+    const popup = document.getElementById("achievementPopup");
+    const popupTitle = document.getElementById("achievementPopupTitle");
+    const popupDesc = document.getElementById("achievementPopupDesc");
+    const popupIcon = document.getElementById("achievementPopupIcon");
+
+    let achievementQueue = [];
+    let achievementShowing = false;
+
+    function getSeenBadges() {
+        try {
+            return JSON.parse(localStorage.getItem(achievementStorageKey)) || [];
+        } catch (error) {
+            return [];
+        }
+    }
+
+    function saveSeenBadges(seenBadges) {
+        localStorage.setItem(achievementStorageKey, JSON.stringify(seenBadges));
+    }
+
+    function showAchievementPopup(badge) {
+        achievementShowing = true;
+
+        popupTitle.textContent = badge.name;
+        popupDesc.textContent = badge.desc;
+        popupIcon.innerHTML = `<i class="fa-solid ${badge.icon}"></i>`;
+
+        popup.classList.remove("hide");
+        popup.classList.add("show");
+
+        const badgeCard = document.querySelector(`[data-badge-name="${CSS.escape(badge.name)}"]`);
+        if (badgeCard) {
+            badgeCard.classList.add("achievement-glow");
+            setTimeout(() => {
+                badgeCard.classList.remove("achievement-glow");
+            }, 2500);
+        }
+
+        setTimeout(() => {
+            closeAchievementPopup();
+        }, 4200);
+    }
+
+    function closeAchievementPopup() {
+        if (!popup.classList.contains("show")) {
+            return;
+        }
+
+        popup.classList.remove("show");
+        popup.classList.add("hide");
+
+        setTimeout(() => {
+            popup.classList.remove("hide");
+            achievementShowing = false;
+            showNextAchievement();
+        }, 400);
+    }
+
+    function showNextAchievement() {
+        if (achievementShowing || achievementQueue.length === 0) {
+            return;
+        }
+
+        const nextBadge = achievementQueue.shift();
+        showAchievementPopup(nextBadge);
+    }
+
+    function checkNewAchievements() {
+        const seenBadges = getSeenBadges();
+        const newBadges = currentBadges.filter(badge => !seenBadges.includes(badge.name));
+
+        if (newBadges.length > 0) {
+            const updatedSeenBadges = [...seenBadges];
+
+            newBadges.forEach(badge => {
+                achievementQueue.push(badge);
+
+                if (!updatedSeenBadges.includes(badge.name)) {
+                    updatedSeenBadges.push(badge.name);
+                }
+            });
+
+            saveSeenBadges(updatedSeenBadges);
+
+            setTimeout(() => {
+                showNextAchievement();
+            }, 800);
+        }
+    }
+
+    document.addEventListener("DOMContentLoaded", checkNewAchievements);
+
+    function toggleNeonThemeSwitch() {
+    const dashboardPage = document.querySelector(".dashboard-page");
+    const switchInput = document.getElementById("neonThemeSwitch");
+
+    if (switchInput.checked) {
+        dashboardPage.classList.add("neon-theme-active");
+        localStorage.setItem("neon_theme_enabled_{{ username }}", "yes");
+    } else {
+        dashboardPage.classList.remove("neon-theme-active");
+        localStorage.setItem("neon_theme_enabled_{{ username }}", "no");
+    }
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+    const dashboardPage = document.querySelector(".dashboard-page");
+    const switchInput = document.getElementById("neonThemeSwitch");
+    const savedTheme = localStorage.getItem("neon_theme_enabled_{{ username }}");
+
+    if (switchInput) {
+        if (savedTheme === "no") {
+            dashboardPage.classList.remove("neon-theme-active");
+            switchInput.checked = false;
+        } else {
+            dashboardPage.classList.add("neon-theme-active");
+            switchInput.checked = true;
+        }
+    }
+});
+</script>
+{% endblock %}

@@ -1,0 +1,328 @@
+{% extends 'base.html' %}
+
+{% block title %}CyberEscape | Level 1{% endblock %}
+
+{% block content %}
+<section class="level-page">
+    <div class="scan-lines"></div>
+    <div class="floating-particles"></div>
+
+    <div class="level-shell">
+
+        <div class="level-topbar">
+            <div class="level-title-wrap">
+                <p class="level-badge">LEVEL 1</p>
+                <h1 class="level-title">
+                    <span class="green-glow">PASSWORD</span> <span class="blue-glow">FORTRESS</span>
+                </h1>
+            </div>
+
+            <div class="level-stats">
+                <div class="mini-stat">
+                    <span>Time</span>
+                    <strong id="timer">120</strong>
+                </div>
+                <div class="mini-stat">
+                    <span>Score</span>
+                    <strong id="score">0</strong>
+                </div>
+                <div class="mini-stat">
+                    <span>Hints</span>
+                    <strong id="hintCount">0</strong>
+                </div>
+                <div class="mini-stat">
+                    <span>Gate</span>
+                    <strong id="gateProgress">1 / 3</strong>
+                </div>
+            </div>
+        </div>
+
+        <div class="level-grid">
+            <aside class="level-side-card">
+                <h3 class="side-title">Mission Brief</h3>
+                <p class="side-text">
+                    The Password Fortress is under attack. Weak passwords have damaged the defense gates.
+                    Secure all 3 gates before the cracking machine breaks in.
+                </p>
+
+                <h3 class="side-title">Objective</h3>
+                <p class="side-text" id="objectiveText">
+                    Learn how to strengthen a weak password by choosing secure upgrades.
+                </p>
+
+                <h3 class="side-title">Rules</h3>
+                <ul class="side-list">
+                    <li>Correct actions increase score</li>
+                    <li>Wrong actions reduce score</li>
+                    <li>Hints help, but cost points</li>
+                    <li>Complete all 3 gates to finish Level 1</li>
+                </ul>
+
+                <button class="hint-btn" onclick="showHint()">
+                    <i class="fa-solid fa-lightbulb"></i> Use Hint
+                </button>
+
+                <div id="hintBox" class="hint-box">
+                    Hint will appear here.
+                </div>
+
+                <div class="feedback-panel lesson-side-box">
+                    <h3>Cyber Tip</h3>
+                    <p id="sideLessonText">
+                        Strong passwords should be long, unique, and difficult to guess.
+                    </p>
+                </div>
+            </aside>
+
+            <main class="level-main-card">
+
+                <div id="introScreen" class="stage-screen active">
+                    <div class="stage-intro-box">
+                        <div class="fortress-icon">
+                            <i class="fa-solid fa-shield-halved"></i>
+                        </div>
+                        <h2>Escape the Cracking Machine</h2>
+                        <p>
+                            The fortress security is failing because weak passwords were used.
+                            Complete all 3 gates and restore the fortress before time runs out.
+                        </p>
+
+                        <div class="feedback-panel intro-learning-box">
+                            <h3>What You Will Learn</h3>
+                            <p>
+                                In this mission, you will learn that strong passwords usually use uppercase letters,
+                                lowercase letters, numbers, symbols, enough length, and no predictable words or patterns.
+                            </p>
+                        </div>
+
+                        <button class="primary-level-btn" onclick="startStage1()">Start Mission</button>
+                    </div>
+                </div>
+
+                <div id="stage1Screen" class="stage-screen">
+                    <div class="stage-header">
+                        <h2>Gate 1: Repair the Broken Gate</h2>
+                        <p>
+                            The current password is weak. Choose the correct upgrades to strengthen it.
+                        </p>
+                    </div>
+
+                    <div class="broken-lock-area">
+                        <div class="lock-visual">
+                            <i class="fa-solid fa-lock-open"></i>
+                        </div>
+
+                        <div class="password-core">
+                            <p class="core-label">Current Weak Password</p>
+                            <div id="weakPassword" class="weak-password">dragon123</div>
+                            <div class="strength-wrap">
+                                <p>Password Strength</p>
+                                <div class="strength-bar">
+                                    <div id="strengthFill" class="strength-fill"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="upgrade-grid">
+                        <button class="upgrade-card" onclick="selectUpgrade(this, true, 'Uppercase letters improve character variety and make the password harder to guess.')">
+                            <i class="fa-solid fa-arrow-up-right-dots"></i>
+                            <span>Add uppercase letters</span>
+                        </button>
+
+                        <button class="upgrade-card" onclick="selectUpgrade(this, true, 'Special characters improve password complexity and strengthen protection.')">
+                            <i class="fa-solid fa-asterisk"></i>
+                            <span>Add special symbols</span>
+                        </button>
+
+                        <button class="upgrade-card" onclick="selectUpgrade(this, true, 'Longer passwords are usually harder for attackers to crack.')">
+                            <i class="fa-solid fa-text-width"></i>
+                            <span>Increase password length</span>
+                        </button>
+
+                        <button class="upgrade-card" onclick="selectUpgrade(this, true, 'Common words are easier to guess, so removing them makes the password safer.')">
+                            <i class="fa-solid fa-ban"></i>
+                            <span>Remove common word pattern</span>
+                        </button>
+
+                        <button class="upgrade-card" onclick="selectUpgrade(this, true, 'Simple number patterns like 123 are predictable and should be removed.')">
+                            <i class="fa-solid fa-hashtag"></i>
+                            <span>Remove easy number sequence</span>
+                        </button>
+
+                        <button class="upgrade-card" onclick="selectUpgrade(this, false, 'Repeating the same letters makes the password more predictable and weaker.')">
+                            <i class="fa-solid fa-copy"></i>
+                            <span>Repeat the same letters</span>
+                        </button>
+                    </div>
+
+                    <div class="feedback-panel">
+                        <h3>System Feedback</h3>
+                        <p id="feedbackText">Choose upgrades to strengthen the fortress gate.</p>
+                    </div>
+
+                    <div class="feedback-panel educational-panel">
+                        <h3>Learning Feedback</h3>
+                        <p id="lessonText1">
+                            A strong password should not rely on simple words like “dragon” or predictable sequences like “123”.
+                            Good passwords use more variety and more length.
+                        </p>
+                    </div>
+
+                    <div class="level-actions">
+                        <button class="secondary-level-btn" onclick="resetLevel1()">Retry Level</button>
+                        <button id="completeGate1Btn" class="primary-level-btn" onclick="goToStage2()" disabled>
+                            Open Gate 2
+                        </button>
+                    </div>
+                </div>
+
+                <div id="stage2Screen" class="stage-screen">
+                    <div class="stage-header">
+                        <h2>Gate 2: Trap Door Corridor</h2>
+                        <p>
+                            Select all the safe passwords. Avoid the trap doors with weak passwords.
+                        </p>
+                    </div>
+
+                    <div class="door-grid">
+                        <button class="door-card safe-door" onclick="selectDoor(this, true, 'This password is stronger because it has mixed characters and no obvious pattern.')">
+                            <span class="door-password">Q#7Lm!2P</span>
+                        </button>
+
+                        <button class="door-card trap-door" onclick="selectDoor(this, false, 'This is weak because it uses a very common word with an easy number pattern.')">
+                            <span class="door-password">password123</span>
+                        </button>
+
+                        <button class="door-card safe-door" onclick="selectDoor(this, true, 'This password is harder to predict because it uses variety and does not follow a simple word pattern.')">
+                            <span class="door-password">T!9vR@6kZ</span>
+                        </button>
+
+                        <button class="door-card trap-door" onclick="selectDoor(this, false, 'This is weak because it uses a common word that attackers may guess easily.')">
+                            <span class="door-password">football7</span>
+                        </button>
+
+                        <button class="door-card safe-door" onclick="selectDoor(this, true, 'This is a stronger choice because it mixes symbols, letters, and numbers.')">
+                            <span class="door-password">M@8qL#2xW</span>
+                        </button>
+
+                        <button class="door-card trap-door" onclick="selectDoor(this, false, 'Keyboard patterns like qwerty are easy to guess and commonly targeted in attacks.')">
+                            <span class="door-password">qwerty99</span>
+                        </button>
+                    </div>
+
+                    <div class="feedback-panel">
+                        <h3>System Feedback</h3>
+                        <p id="feedbackText2">Find all safe doors to move forward.</p>
+                    </div>
+
+                    <div class="feedback-panel educational-panel">
+                        <h3>Learning Feedback</h3>
+                        <p id="lessonText2">
+                            A password may look complex at first, but it can still be weak if it contains common words,
+                            famous keyboard patterns, or predictable combinations.
+                        </p>
+                    </div>
+
+                    <div class="level-actions">
+                        <button class="secondary-level-btn" onclick="resetStage2()">Retry Gate 2</button>
+                        <button id="completeGate2Btn" class="primary-level-btn" onclick="goToStage3()" disabled>
+                            Open Gate 3
+                        </button>
+                    </div>
+                </div>
+
+                <div id="stage3Screen" class="stage-screen">
+                    <div class="stage-header">
+                        <h2>Gate 3: Fortress Boss Gate</h2>
+                        <p>
+                            Build the strongest master password. Avoid personal information and weak patterns.
+                        </p>
+                    </div>
+
+                    <div class="builder-area">
+                        <p class="core-label">Weak Password Found</p>
+                        <div class="weak-password">Anas2002</div>
+
+                        <p class="core-label" style="margin-top: 18px;">Security Clue</p>
+                        <div class="hint-box" style="display:block;">
+                            Name: Anas <br>
+                            Birth Year: 2002
+                        </div>
+
+                        <p class="core-label" style="margin-top: 18px;">Master Key Builder</p>
+                        <div id="masterKeyBox" class="master-key-box">_ _ _ _</div>
+                    </div>
+
+                    <div class="piece-grid">
+                        <button class="piece-card" onclick="selectPiece(this, true, 'Good choice. This part is not personal and helps make the password less predictable.')">Tiger</button>
+                        <button class="piece-card" onclick="selectPiece(this, true, 'Good choice. Symbols improve password complexity.')">#</button>
+                        <button class="piece-card" onclick="selectPiece(this, true, 'Good choice. Mixed characters make the password stronger.')">A!9</button>
+                        <button class="piece-card" onclick="selectPiece(this, true, 'Good choice. This adds extra strength without using personal data.')">Vault</button>
+
+                        <button class="piece-card" onclick="selectPiece(this, false, 'Wrong choice. Birth years are easy to guess and should not be used.')">2002</button>
+                        <button class="piece-card" onclick="selectPiece(this, false, 'Wrong choice. Names are personal information and make passwords predictable.')">anas</button>
+                        <button class="piece-card" onclick="selectPiece(this, false, 'Wrong choice. Simple repeating numbers are weak and predictable.')">123</button>
+                        <button class="piece-card" onclick="selectPiece(this, false, 'Wrong choice. Common words like password are very risky.')">password</button>
+                    </div>
+
+                    <div class="feedback-panel">
+                        <h3>System Feedback</h3>
+                        <p id="feedbackText3">Choose only the strongest password parts to unlock the fortress core.</p>
+                    </div>
+
+                    <div class="feedback-panel educational-panel">
+                        <h3>Learning Feedback</h3>
+                        <p id="lessonText3">
+                            Strong passwords should avoid names, birth years, and simple number patterns.
+                            They should use less predictable words, symbols, and mixed character combinations.
+                        </p>
+                    </div>
+
+                    <div class="level-actions">
+                        <button class="secondary-level-btn" onclick="resetStage3()">Retry Gate 3</button>
+                        <button id="finishLevelBtn" class="primary-level-btn" onclick="completeLevel1()" disabled>
+                            Unlock Fortress Core
+                        </button>
+                    </div>
+                </div>
+
+                <div id="resultScreen" class="stage-screen">
+                    <div class="stage-intro-box">
+                        <div class="fortress-icon success-icon">
+                            <i class="fa-solid fa-lock"></i>
+                        </div>
+                        <h2>Fortress Secured</h2>
+                        <p id="resultSummary">
+                            You completed Level 1 successfully.
+                        </p>
+
+                        <div class="feedback-panel final-learning-box">
+                            <h3>What You Learned</h3>
+                            <ul class="side-list final-lesson-list">
+                                <li>Strong passwords should avoid names, birthdays, and personal information</li>
+                                <li>Numbers and symbols improve password complexity</li>
+                                <li>Longer and less predictable passwords are harder to crack</li>
+                                <li>Common words and simple patterns make passwords weak</li>
+                                <li>Unique passwords are safer than easy-to-guess passwords</li>
+                            </ul>
+                        </div>
+
+                        <div class="feedback-panel final-learning-box">
+                            <h3>Real-Life Safety Advice</h3>
+                            <p>
+                                Use a different password for each important account. Avoid names, birthdays,
+                                “123”, or common words. If possible, use a password manager to create and store
+                                strong passwords safely.
+                            </p>
+                        </div>
+
+                        <button class="primary-level-btn" onclick="goDashboard()">Return to Dashboard</button>
+                    </div>
+                </div>
+
+            </main>
+        </div>
+    </div>
+</section>
+{% endblock %}

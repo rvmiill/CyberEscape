@@ -1,0 +1,1520 @@
+{% extends 'base.html' %}
+
+{% block title %}CyberEscape | Level 3{% endblock %}
+
+{% block content %}
+<style>
+*{box-sizing:border-box}
+
+body{
+    margin:0;
+    min-height:100vh;
+    overflow:auto;
+    font-family:"Segoe UI",Arial,sans-serif;
+    background:#020914;
+    color:white;
+}
+
+.level3-wrap{
+    min-height:100vh;
+    display:flex;
+    flex-direction:column;
+    background:radial-gradient(circle at center,#0b3140,#020914 70%);
+}
+
+/* INTRO */
+.level3-intro{
+    position:fixed;
+    inset:0;
+    z-index:900;
+    background:#020914;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:30px;
+}
+
+.level3-intro-box{
+    width:900px;
+    max-width:100%;
+    text-align:center;
+    background:rgba(3,20,35,.96);
+    border:2px solid #00ffc8;
+    border-radius:28px;
+    padding:36px;
+    box-shadow:0 0 40px rgba(0,255,200,.25);
+}
+
+.level3-intro-box h1{
+    color:#00ffc8;
+    font-size:42px;
+    margin:0 0 15px;
+}
+
+.level3-intro-box p{
+    color:#d9faff;
+    line-height:1.7;
+    font-size:17px;
+}
+
+.stage-guide{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:14px;
+    margin:26px 0;
+}
+
+.guide-box{
+    background:rgba(255,255,255,.06);
+    border:1px solid rgba(0,255,200,.3);
+    border-radius:18px;
+    padding:18px;
+    text-align:left;
+}
+
+.guide-box h3{
+    margin-top:0;
+    color:#00ffc8;
+}
+
+.intro-btn{
+    background:#00ffc8;
+    color:#031014;
+    border:none;
+    padding:15px 28px;
+    border-radius:16px;
+    font-weight:900;
+    font-size:17px;
+    cursor:pointer;
+}
+
+/* TOP BAR */
+.topbar{
+    min-height:94px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:16px;
+    padding:14px 24px;
+    border-bottom:1px solid rgba(0,255,200,.25);
+    background:rgba(0,10,22,.88);
+}
+
+.title-wrap{
+    display:flex;
+    align-items:center;
+    gap:16px;
+}
+
+.level-badge{
+    padding:12px 24px;
+    border:1px solid #00eaff;
+    border-radius:20px;
+    color:#64f7ff;
+    font-weight:900;
+    font-size:20px;
+}
+
+.game-title{
+    color:#00ffc8;
+    font-size:30px;
+    font-weight:900;
+    letter-spacing:6px;
+}
+
+.stats{
+    display:flex;
+    gap:12px;
+    flex-wrap:wrap;
+    justify-content:flex-end;
+}
+
+.stat{
+    min-width:132px;
+    height:62px;
+    border:1px solid rgba(0,234,255,.4);
+    background:rgba(4,25,40,.9);
+    border-radius:18px;
+    display:flex;
+    align-items:center;
+    gap:10px;
+    justify-content:center;
+}
+
+.stat .icon{
+    font-size:27px;
+}
+
+.stat span{
+    display:block;
+    font-size:12px;
+    color:#69efff;
+    font-weight:800;
+}
+
+.stat b{
+    font-size:24px;
+}
+
+/* MAIN */
+.main{
+    flex:1;
+    display:grid;
+    grid-template-columns:280px 1fr 300px;
+    gap:14px;
+    padding:16px 20px 125px;
+}
+
+.panel{
+    background:rgba(2,17,31,.88);
+    border:1px solid rgba(0,255,200,.45);
+    border-radius:18px;
+    padding:20px;
+    overflow:auto;
+}
+
+.panel h3{
+    color:#00ffc8;
+    margin:0 0 15px;
+    font-size:22px;
+}
+
+.panel p,.panel li{
+    color:#dff8ff;
+    line-height:1.55;
+    font-size:16px;
+}
+
+.yellow{
+    color:#ffe763!important;
+}
+
+.malware-list{
+    display:grid;
+    gap:18px;
+}
+
+.type-row{
+    display:flex;
+    align-items:flex-start;
+    gap:12px;
+    font-size:18px;
+}
+
+.type-row span{
+    font-size:28px;
+    flex:0 0 auto;
+}
+
+.type-row small{
+    color:#bff8ff;
+    font-size:13px;
+    line-height:1.4;
+}
+
+.progress-ring{
+    margin:18px auto;
+    width:76px;
+    height:76px;
+    border-radius:50%;
+    border:3px solid #00ffc8;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:22px;
+    font-weight:900;
+}
+
+.progress-bar{
+    height:18px;
+    background:rgba(255,255,255,.1);
+    border-radius:30px;
+    overflow:hidden;
+    margin-top:16px;
+}
+
+.progress-fill{
+    height:100%;
+    width:0%;
+    background:#00ffc8;
+    transition:.4s;
+}
+
+.hint-card,.feedback-card{
+    background:rgba(255,255,255,.05);
+    border:1px solid rgba(0,255,200,.25);
+    border-radius:16px;
+    padding:16px;
+    margin-top:12px;
+}
+
+/* LAB */
+.lab-area{
+    position:relative;
+    overflow:hidden;
+    border-radius:26px;
+    border:1px solid rgba(0,255,200,.28);
+    min-height:680px;
+    background:
+        linear-gradient(rgba(0,255,200,.08) 1px,transparent 1px),
+        linear-gradient(90deg,rgba(0,255,200,.08) 1px,transparent 1px),
+        radial-gradient(circle at top,#174054,#07202c 65%,#03111a);
+    background-size:48px 48px,48px 48px,100% 100%;
+    box-shadow:inset 0 0 50px rgba(0,0,0,.5);
+}
+
+.lab-sign{
+    position:absolute;
+    left:50%;
+    top:20px;
+    transform:translateX(-50%);
+    color:#00ffc8;
+    border:2px solid #00ffc8;
+    border-radius:14px;
+    padding:10px 38px;
+    font-size:28px;
+    font-weight:900;
+    background:rgba(0,20,20,.8);
+    box-shadow:0 0 18px rgba(0,255,200,.4);
+}
+
+.path-line{
+    position:absolute;
+    height:6px;
+    background:repeating-linear-gradient(
+        90deg,
+        #42ffe8 0px,
+        #42ffe8 18px,
+        transparent 18px,
+        transparent 30px
+    );
+    border-radius:20px;
+    opacity:.9;
+    box-shadow:0 0 14px rgba(66,255,232,.8);
+    pointer-events:none;
+}
+
+.line1{left:27%;top:43%;width:18%}
+.line2{left:56%;top:43%;width:18%}
+
+.line3{
+    left:77%;
+    top:48%;
+    width:6px;
+    height:22%;
+    background:repeating-linear-gradient(
+        180deg,
+        #42ffe8 0px,
+        #42ffe8 18px,
+        transparent 18px,
+        transparent 30px
+    );
+}
+
+.line4{left:56%;top:72%;width:18%}
+.line5{left:27%;top:72%;width:18%}
+
+.pc{
+    position:absolute;
+    width:150px;
+    height:135px;
+    border-radius:20px;
+    background:linear-gradient(#123048,#071522);
+    border:2px solid rgba(0,255,200,.4);
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    box-shadow:0 12px 0 rgba(0,0,0,.25),0 0 20px rgba(0,255,200,.1);
+}
+
+.pc.active{
+    border-color:#ffe763;
+    box-shadow:0 0 35px rgba(255,231,99,.45);
+    animation:pulsePc 1s infinite alternate;
+}
+
+.pc.solved{
+    border-color:#00ff88;
+    box-shadow:0 0 28px rgba(0,255,136,.35);
+}
+
+.pc.locked{
+    opacity:.45;
+    filter:grayscale(.5);
+}
+
+@keyframes pulsePc{
+    from{transform:scale(1)}
+    to{transform:scale(1.04)}
+}
+
+.screen{
+    width:90px;
+    height:62px;
+    background:#020914;
+    border:3px solid #30d8ff;
+    border-radius:12px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:34px;
+    margin-bottom:8px;
+}
+
+.pc.active .screen{
+    border-color:#ffe763;
+}
+
+.pc.solved .screen{
+    border-color:#00ff88;
+}
+
+.pc-name{
+    font-weight:900;
+    font-size:18px;
+}
+
+.pc-status{
+    font-weight:900;
+    color:#ff5555;
+}
+
+.pc.solved .pc-status{
+    color:#00ff88;
+}
+
+/* HERO */
+.character{
+    position:absolute;
+    width:64px;
+    height:84px;
+    z-index:5;
+    left:80px;
+    top:280px;
+    transition:left 1.25s ease,top 1.25s ease;
+}
+
+.hero-head{
+    width:38px;
+    height:38px;
+    border-radius:50%;
+    background:#ffd2a6;
+    margin:0 auto;
+    position:relative;
+    border:2px solid #071522;
+}
+
+.hero-hair{
+    position:absolute;
+    left:3px;
+    top:-4px;
+    width:32px;
+    height:18px;
+    background:#101827;
+    border-radius:50% 50% 30% 30%;
+}
+
+.hero-body{
+    width:44px;
+    height:42px;
+    background:#0b6e8f;
+    margin:2px auto 0;
+    border-radius:14px 14px 10px 10px;
+    border:2px solid #00ffc8;
+}
+
+.hero-leg{
+    width:16px;
+    height:22px;
+    background:#17243a;
+    display:inline-block;
+    border-radius:8px;
+    margin:0 2px;
+    animation:walk .5s infinite alternate;
+}
+
+.hero-legs{
+    text-align:center;
+    margin-top:-2px;
+}
+
+.hero-leg:nth-child(2){
+    animation-delay:.25s;
+}
+
+@keyframes walk{
+    from{transform:rotate(12deg)}
+    to{transform:rotate(-12deg)}
+}
+
+.character.idle .hero-leg{
+    animation:none;
+}
+
+/* BOTTOM DIALOGUE */
+.dialogue{
+    position:fixed;
+    left:20px;
+    right:20px;
+    bottom:14px;
+    z-index:100;
+    min-height:100px;
+    border-radius:18px;
+    border:1px solid rgba(0,255,200,.4);
+    background:rgba(2,17,31,.96);
+    display:flex;
+    align-items:center;
+    gap:18px;
+    padding:12px 22px;
+}
+
+.avatar{
+    width:64px;
+    height:64px;
+    border-radius:50%;
+    background:#ffd2a6;
+    border:2px solid #00ffc8;
+    position:relative;
+    flex:0 0 auto;
+}
+
+.avatar:before{
+    content:"";
+    position:absolute;
+    left:8px;
+    top:4px;
+    width:48px;
+    height:20px;
+    background:#101827;
+    border-radius:50%;
+}
+
+.dialogue-text{
+    font-size:22px;
+    color:#bff8ff;
+    flex:1;
+}
+
+/* MODAL */
+.modal{
+    position:fixed;
+    inset:0;
+    z-index:800;
+    background:rgba(0,0,0,.82);
+    display:none;
+    align-items:center;
+    justify-content:center;
+    padding:20px;
+    overflow:auto;
+}
+
+.modal-card{
+    width:980px;
+    max-width:100%;
+    max-height:92vh;
+    overflow:auto;
+    background:#071522;
+    border:2px solid #00ffc8;
+    border-radius:24px;
+    padding:24px;
+    box-shadow:0 0 45px rgba(0,255,200,.25);
+}
+
+.modal-top{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:20px;
+}
+
+.modal-top h2{
+    color:#00ffc8;
+    margin:0;
+}
+
+.close-btn,.submit-btn{
+    background:#00ffc8;
+    color:#031014;
+    border:none;
+    padding:12px 18px;
+    border-radius:12px;
+    font-weight:900;
+    cursor:pointer;
+}
+
+.monitor{
+    margin:18px 0;
+    padding:18px;
+    border-radius:18px;
+    background:#020914;
+    border:3px solid #30d8ff;
+    min-height:210px;
+}
+
+.monitor-title{
+    color:#00ffc8;
+    font-weight:900;
+    margin-bottom:12px;
+}
+
+.symptoms{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:12px;
+}
+
+.symptom{
+    background:rgba(255,255,255,.06);
+    border:1px solid rgba(255,255,255,.13);
+    border-radius:14px;
+    padding:14px;
+    display:flex;
+    align-items:center;
+    gap:12px;
+}
+
+.symptom-icon{
+    font-size:32px;
+}
+
+.symptom-text{
+    color:#e9fbff;
+    font-size:16px;
+}
+
+.choices{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:18px;
+}
+
+.choices h3{
+    color:#00ffc8;
+}
+
+.choice-grid{
+    display:grid;
+    gap:10px;
+}
+
+.choice-grid button{
+    text-align:left;
+    background:rgba(255,255,255,.08);
+    color:white;
+    border:1px solid rgba(255,255,255,.14);
+    padding:13px;
+    border-radius:12px;
+    font-weight:800;
+    cursor:pointer;
+}
+
+.choice-grid button.selected{
+    background:rgba(255,231,99,.18);
+    border-color:#ffe763;
+    color:#ffe763;
+}
+
+.choice-grid button:hover{
+    border-color:#00ffc8;
+}
+
+.modal-actions{
+    margin-top:18px;
+}
+
+/* RESULT */
+.result-screen{
+    position:fixed;
+    inset:0;
+    z-index:950;
+    display:none;
+    align-items:center;
+    justify-content:center;
+    background:rgba(0,0,0,.88);
+    padding:20px;
+}
+
+.result-card{
+    width:720px;
+    max-width:100%;
+    background:#071522;
+    border:2px solid #00ffc8;
+    border-radius:24px;
+    padding:34px;
+    text-align:center;
+}
+
+.result-card h1{
+    color:#00ffc8;
+    margin-top:0;
+}
+
+.result-grid{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:14px;
+    margin:24px 0;
+}
+
+.result-box{
+    background:rgba(255,255,255,.06);
+    border-radius:14px;
+    padding:18px;
+}
+
+.result-box b{
+    font-size:26px;
+    color:#00ffc8;
+}
+
+.result-actions button{
+    background:#00ffc8;
+    color:#031014;
+    border:none;
+    padding:12px 16px;
+    border-radius:10px;
+    font-weight:bold;
+    margin:5px;
+    cursor:pointer;
+}
+
+.hidden{
+    display:none!important;
+}
+
+@media(max-width:1200px){
+    .main{
+        grid-template-columns:1fr;
+    }
+    .lab-area{
+        min-height:680px;
+    }
+}
+/* WRONG ANSWER POPUP */
+.wrong-popup{
+    position:fixed;
+    inset:0;
+    z-index:9999;
+    display:none;
+    align-items:center;
+    justify-content:center;
+    background:rgba(0,0,0,.55);
+}
+
+.wrong-popup-card{
+    width:420px;
+    max-width:90%;
+    background:#071522;
+    border:3px solid #ff3366;
+    border-radius:24px;
+    padding:30px;
+    text-align:center;
+    color:white;
+    box-shadow:0 0 45px rgba(255,51,102,.5);
+    animation:wrongPop .35s ease;
+}
+
+.wrong-popup-card h1{
+    color:#ff3366;
+    margin:0 0 10px;
+    font-size:42px;
+}
+
+.wrong-popup-card p{
+    color:#ffd6df;
+    font-size:18px;
+}
+
+@keyframes wrongPop{
+    from{
+        transform:scale(.7);
+        opacity:0;
+    }
+    to{
+        transform:scale(1);
+        opacity:1;
+    }
+}
+</style>
+
+<div class="level3-wrap">
+
+    <div class="level3-intro" id="introScreen">
+        <div class="level3-intro-box">
+            <h1>Level 3: Malware Diagnosis Lab</h1>
+            <p>
+                Enter the cyber lab. Your analyst character will move automatically from PC to PC.
+                At each computer, inspect the screen symptoms, diagnose the malware, and choose the correct solution.
+            </p>
+            <h1>Malware Types</h1>
+            <h3>🦠 Virus</h3><p>Attaches to files or programs and spreads when they are opened.</p>
+            <h3>🌐 Worm</h3>
+            <p>Spreads automatically through a network without user action.</p>
+            <h3>🎭 Trojan</h3>
+            <p>Pretends to be safe or useful software but hides malware.</p>
+            <h3>🔒 Ransomware</h3>
+            <p>Locks or encrypts files and demands payment.</p>
+            <h3>👁️ Spyware</h3>
+            <p>Secretly monitors users and steals private information.</p>
+
+
+            <div class="stage-guide">
+                <div class="guide-box">
+                    <h3>1. Move to PC</h3>
+                    <p>The character walks automatically to the current infected computer.</p>
+                </div>
+
+                <div class="guide-box">
+                    <h3>2. Diagnose</h3>
+                    <p>Look at the visual symptoms on the computer screen.</p>
+                </div>
+
+                <div class="guide-box">
+                    <h3>3. Secure Lab</h3>
+                    <p>After solving one PC, the character moves to the next PC.</p>
+                </div>
+            </div>
+
+            <button class="intro-btn" onclick="startLevel3()">Enter Lab</button>
+        </div>
+    </div>
+
+    <div class="topbar">
+        <div class="title-wrap">
+            <div class="level-badge">LEVEL 3</div>
+            <div class="game-title">MALWARE DIAGNOSIS LAB</div>
+        </div>
+
+        <div class="stats">
+            <div class="stat">
+                <div class="icon">⏱</div>
+                <div><span>TIME</span><b id="timer">180</b></div>
+            </div>
+
+            <div class="stat">
+                <div class="icon">⭐</div>
+                <div><span>SCORE</span><b id="score">0</b></div>
+            </div>
+
+            <div class="stat">
+                <div class="icon">💡</div>
+                <div><span>HINTS USED</span><b id="hintsUsedText">0</b></div>
+            </div>
+
+            <div class="stat">
+                <div class="icon">🛡</div>
+                <div><span>ACCURACY</span><b id="accuracyText">100%</b></div>
+            </div>
+
+            <div class="stat">
+                <div class="icon">🦠</div>
+                <div><span>INFECTION</span><b id="infectionText">0%</b></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="main">
+        <div>
+            <div class="panel">
+                <h3>MISSION</h3>
+                <p>Inspect each computer, diagnose the malware, and apply the correct response.</p>
+                <p class="yellow">Secure all PCs to unlock the exit.</p>
+            </div>
+
+            <div class="panel" style="margin-top:14px;">
+    <h3>MALWARE TYPES</h3>
+
+    <div class="malware-list">
+        <div class="type-row"><span>🦠</span> Virus</div>
+        <div class="type-row"><span>🌐</span> Worm</div>
+        <div class="type-row"><span>🎭</span> Trojan</div>
+        <div class="type-row"><span>🔒</span> Ransomware</div>
+        <div class="type-row"><span>👁️</span> Spyware</div>
+    </div>
+</div>
+
+            <div class="panel" style="margin-top:14px;">
+                <h3>PROGRESS</h3>
+                <div class="progress-ring">
+                    <span id="progressText">0/6</span>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="lab-area">
+            <div class="lab-sign">CYBER LAB</div>
+
+            <div class="path-line line1"></div>
+            <div class="path-line line2"></div>
+            <div class="path-line line3"></div>
+            <div class="path-line line4"></div>
+            <div class="path-line line5"></div>
+
+            <div class="pc active" id="pc0" style="left:12%;top:24%;">
+                <div class="screen">🦠</div>
+                <div class="pc-name">PC-01</div>
+                <div class="pc-status">INFECTED</div>
+            </div>
+
+            <div class="pc locked" id="pc1" style="left:42%;top:24%;">
+                <div class="screen">🌐</div>
+                <div class="pc-name">PC-02</div>
+                <div class="pc-status">LOCKED</div>
+            </div>
+
+            <div class="pc locked" id="pc2" style="left:72%;top:24%;">
+                <div class="screen">🎭</div>
+                <div class="pc-name">PC-03</div>
+                <div class="pc-status">LOCKED</div>
+            </div>
+
+            <div class="pc locked" id="pc3" style="left:72%;top:58%;">
+                <div class="screen">🔒</div>
+                <div class="pc-name">PC-04</div>
+                <div class="pc-status">LOCKED</div>
+            </div>
+
+            <div class="pc locked" id="pc4" style="left:42%;top:58%;">
+                <div class="screen">👁️</div>
+                <div class="pc-name">PC-05</div>
+                <div class="pc-status">LOCKED</div>
+            </div>
+
+            <div class="pc locked" id="pc5" style="left:12%;top:58%;">
+                <div class="screen">⚠️</div>
+                <div class="pc-name">PC-06</div>
+                <div class="pc-status">LOCKED</div>
+            </div>
+
+            <div class="character" id="hero">
+                <div class="hero-head"><div class="hero-hair"></div></div>
+                <div class="hero-body"></div>
+                <div class="hero-legs">
+                    <div class="hero-leg"></div>
+                    <div class="hero-leg"></div>
+                </div>
+            </div>
+        </div>
+
+        <div>
+            <div class="panel">
+                <h3>CURRENT OBJECTIVE</h3>
+                <p id="objectiveText">Go to PC-01 and secure it.</p>
+
+                <div style="display:flex;gap:8px;margin-top:15px;flex-wrap:wrap;">
+                    <span id="dot0" class="level-badge" style="padding:8px 13px;">1</span>
+                    <span id="dot1" class="level-badge" style="padding:8px 13px;opacity:.4;">2</span>
+                    <span id="dot2" class="level-badge" style="padding:8px 13px;opacity:.4;">3</span>
+                    <span id="dot3" class="level-badge" style="padding:8px 13px;opacity:.4;">4</span>
+                    <span id="dot4" class="level-badge" style="padding:8px 13px;opacity:.4;">5</span>
+                    <span id="dot5" class="level-badge" style="padding:8px 13px;opacity:.4;">6</span>
+                </div>
+            </div>
+
+            <div class="panel" style="margin-top:14px;">
+                <h3>💡 HINT</h3>
+                <div class="hint-card" id="hintBox">Click Use Hint if you need help.</div>
+                <button class="intro-btn" style="margin-top:12px;width:100%;" onclick="useHint()">Use Hint</button>
+            </div>
+
+            <div class="panel" style="margin-top:14px;">
+                <h3>SYSTEM FEEDBACK</h3>
+                <div class="feedback-card" id="feedbackText">Moving to PC-01...</div>
+                <div class="meter-wrap"><div class="meter-bar" id="infectionBar"></div></div>
+                <p style="margin-top:12px;">Rank: <b id="rankText">Cyber Trainee</b></p>
+            </div>
+        </div>
+    </div>
+
+    <div class="dialogue">
+        <div class="avatar"></div>
+        <div class="dialogue-text" id="dialogueText">I’m entering the lab. First, I’ll inspect PC-01.</div>
+        <button class="intro-btn" id="analyzeBtn" onclick="openCurrentCase()" disabled>Analyze PC</button>
+    </div>
+</div>
+
+<div class="modal" id="caseModal">
+    <div class="modal-card">
+        <div class="modal-top">
+            <div>
+                <h2 id="modalTitle">PC Case</h2>
+                <p id="modalLocation" style="color:#d9faff;margin:6px 0 0;"></p>
+            </div>
+            <button class="close-btn" onclick="closeModal()">Close</button>
+        </div>
+
+        <div class="monitor">
+            <div class="monitor-title">🖥 Computer Screen Symptoms</div>
+            <div class="symptoms" id="symptomBox"></div>
+        </div>
+
+        <div class="choices">
+            <div>
+                <h3>1. Diagnose Malware Type</h3>
+                <div class="choice-grid" id="diagnosisChoices"></div>
+            </div>
+
+            <div>
+                <h3>2. Choose Correct Solution</h3>
+                <div class="choice-grid" id="responseChoices"></div>
+            </div>
+        </div>
+
+        <div class="modal-actions">
+            <button class="submit-btn" onclick="submitCase()">Submit Analysis</button>
+        </div>
+    </div>
+</div>
+
+<div class="wrong-popup" id="wrongPopup">
+    <div class="wrong-popup-card">
+        <h1>❌ WRONG</h1>
+        <p>Incorrect malware diagnosis.</p>
+        <p>Check the symptoms and try again.</p>
+    </div>
+</div>
+
+<div class="result-screen" id="resultScreen">
+    <div class="result-card">
+        <h1 id="resultTitle">Diagnosis Lab Complete</h1>
+        <p id="resultMessage">You completed Level 3.</p>
+
+        <div class="result-grid">
+            <div class="result-box">Final Score<br><b id="finalScore">0</b></div>
+            <div class="result-box">Accuracy<br><b id="finalAccuracy">0%</b></div>
+            <div class="result-box">Infection<br><b id="finalInfection">0%</b></div>
+            <div class="result-box">Time Used<br><b id="finalTime">0s</b></div>
+        </div>
+
+        <h2 id="finalRank">Cyber Trainee</h2>
+
+        <div class="result-actions">
+            <button onclick="restartGame()">Play Again</button>
+            <button onclick="window.location.href='/level4'">Continue to Level 4</button>
+            <button onclick="window.location.href='/dashboard'">Back to Dashboard</button>
+        </div>
+    </div>
+</div>
+
+<audio id="correctSound" src="{{ url_for('static', filename='audio/correct.mp3') }}"></audio>
+<audio id="wrongSound" src="{{ url_for('static', filename='audio/wrong.mp3') }}"></audio>
+<audio id="completeSound" src="{{ url_for('static', filename='audio/complete.mp3') }}"></audio>
+
+<script>
+const cases=[
+    {
+        pc:"PC-01",
+        name:"Shared Lab Computer",
+        location:"Student Computer Lab",
+        diagnosis:"virus",
+        response:"quarantine_scan",
+        hint:"This PC shows file corruption and malware attached to documents.",
+        learning:"A virus attaches to files or programs. Quarantine and scan infected files.",
+        symptoms:[
+            ["📄","report.docx is corrupted"],
+            ["📄","assignment.pdf shows strange symbols"],
+            ["🔌","USB was opened before infection"],
+            ["🦠","Malware appears attached to documents"]
+        ]
+    },
+    {
+        pc:"PC-02",
+        name:"Network Outbreak",
+        location:"University Network Segment",
+        diagnosis:"worm",
+        response:"disconnect_network",
+        hint:"This malware spreads automatically from one computer to another.",
+        learning:"A worm spreads through networks. Disconnecting affected devices stops propagation.",
+        symptoms:[
+            ["🌐","Many computers infected quickly"],
+            ["📡","Network traffic is very high"],
+            ["➡️","Infection jumps from PC to PC"],
+            ["⚠️","No shared file was opened manually"]
+        ]
+    },
+    {
+        pc:"PC-03",
+        name:"Free Game Installer",
+        location:"Student Laptop",
+        diagnosis:"trojan",
+        response:"remove_app",
+        hint:"The program pretends to be useful but hides malware.",
+        learning:"A trojan disguises itself as safe software. Remove the suspicious application.",
+        symptoms:[
+            ["🎮","Free game installer downloaded"],
+            ["🎭","Application looks normal"],
+            ["⚙️","Unknown background process"],
+            ["🔑","Requests admin permission"]
+        ]
+    },
+    {
+        pc:"PC-04",
+        name:"Locked Research Files",
+        location:"Research Office",
+        diagnosis:"ransomware",
+        response:"restore_backup",
+        hint:"Files are locked and payment is demanded.",
+        learning:"Ransomware encrypts files. Restore clean backups and isolate the system.",
+        symptoms:[
+            ["🔒","Files are encrypted"],
+            ["💰","Payment message appears"],
+            ["📁","Folders cannot be opened"],
+            ["⏳","Countdown threatens deletion"]
+        ]
+    },
+    {
+        pc:"PC-05",
+        name:"Hidden Monitoring",
+        location:"Staff Workstation",
+        diagnosis:"spyware",
+        response:"remove_spyware",
+        hint:"This malware secretly monitors user activity.",
+        learning:"Spyware monitors users and steals private data. Remove it and change passwords.",
+        symptoms:[
+            ["👁️","Unknown browser extension"],
+            ["🎥","Camera permission enabled"],
+            ["⌨️","Keystrokes may be recorded"],
+            ["🔐","Saved passwords may be stolen"]
+        ]
+    },
+    {
+        pc:"PC-06",
+        name:"Fake Security Alert",
+        location:"Personal Laptop",
+        diagnosis:"trojan",
+        response:"close_verify",
+        hint:"Fake security tools can hide malware.",
+        learning:"Fake antivirus popups may install trojans. Close and verify with trusted tools.",
+        symptoms:[
+            ["⚠️","Fake antivirus popup"],
+            ["⬇️","Suspicious cleaner asks to install"],
+            ["🔑","Requests admin access"],
+            ["❌","Warning outside trusted software"]
+        ]
+    }
+];
+
+const diagnosisOptions=[
+    ["virus","🦠 Virus"],
+    ["worm","🌐 Worm"],
+    ["trojan","🎭 Trojan"],
+    ["ransomware","🔒 Ransomware"],
+    ["spyware","👁️ Spyware"]
+];
+
+const responseOptions=[
+    ["disconnect_network","🔌 Disconnect affected devices"],
+    ["quarantine_scan","🛡 Quarantine file and run antivirus scan"],
+    ["close_verify","❌ Close popup and verify with trusted tool"],
+    ["restore_backup","💾 Restore clean backup"],
+    ["remove_spyware","🧹 Remove spyware and change passwords"],
+    ["remove_app","🗑 Remove suspicious application"]
+];
+
+const heroPositions=[
+    {left:"18%",top:"42%"},
+    {left:"48%",top:"42%"},
+    {left:"78%",top:"42%"},
+    {left:"78%",top:"72%"},
+    {left:"48%",top:"72%"},
+    {left:"18%",top:"72%"}
+];
+
+let current=0;
+let score=0;
+let solved=0;
+let wrong=0;
+let attempts=0;
+let infection=0;
+let hintsUsed=0;
+let timer=180;
+let selectedDiagnosis=null;
+let selectedResponse=null;
+let gameOver=false;
+let progressSaved=false;
+let startTime=null;
+let completionTime=0;
+let timerInterval=null;
+
+function playSound(id){
+    const sound=document.getElementById(id);
+    if(sound){
+        sound.currentTime=0;
+        sound.play().catch(()=>{});
+    }
+}
+
+function startLevel3(){
+    document.getElementById("introScreen").style.display="none";
+    document.getElementById("hintBox").textContent="Click Use Hint if you need help.";
+
+    startTime=Date.now();
+    moveHeroToCurrent();
+
+    timerInterval=setInterval(()=>{
+        if(gameOver)return;
+
+        timer--;
+        document.getElementById("timer").textContent=timer;
+
+        if(timer<=0){
+            finishGame(false,"Time is over. The malware lab was not secured.");
+        }
+    },1000);
+
+    updateUI();
+}
+
+function moveHeroToCurrent(){
+    if(current>=cases.length)return;
+
+    document.getElementById("analyzeBtn").disabled=true;
+
+    const hero=document.getElementById("hero");
+    hero.classList.remove("idle");
+    hero.style.left=heroPositions[current].left;
+    hero.style.top=heroPositions[current].top;
+
+    document.getElementById("dialogueText").textContent=`I’m moving to ${cases[current].pc} to analyze the issue.`;
+    document.getElementById("objectiveText").textContent=`Go to ${cases[current].pc} and secure it.`;
+    document.getElementById("feedbackText").textContent=`Following path to ${cases[current].pc}...`;
+
+    setTimeout(()=>{
+        if(gameOver || current>=cases.length)return;
+
+        hero.classList.add("idle");
+        document.getElementById("analyzeBtn").disabled=false;
+        document.getElementById("dialogueText").textContent=`I reached ${cases[current].pc}. Open the computer and inspect the symptoms.`;
+        document.getElementById("feedbackText").textContent=`Ready to analyze ${cases[current].pc}.`;
+        document.getElementById("hintBox").textContent="Click Use Hint if you need help.";
+    },1300);
+}
+
+function openCurrentCase(){
+    if(current>=cases.length)return;
+
+    selectedDiagnosis=null;
+    selectedResponse=null;
+
+    const item=cases[current];
+
+    document.getElementById("caseModal").style.display="flex";
+    document.getElementById("modalTitle").textContent=`${item.pc}: ${item.name}`;
+    document.getElementById("modalLocation").textContent=`Location: ${item.location}`;
+
+    const box=document.getElementById("symptomBox");
+    box.innerHTML="";
+
+    item.symptoms.forEach(symptom=>{
+        const div=document.createElement("div");
+        div.className="symptom";
+        div.innerHTML=`
+            <div class="symptom-icon">${symptom[0]}</div>
+            <div class="symptom-text">${symptom[1]}</div>
+        `;
+        box.appendChild(div);
+    });
+
+    renderChoices();
+}
+
+function closeModal(){
+    document.getElementById("caseModal").style.display="none";
+}
+
+function renderChoices(){
+    const diagnosisBox=document.getElementById("diagnosisChoices");
+    const responseBox=document.getElementById("responseChoices");
+
+    diagnosisBox.innerHTML="";
+    responseBox.innerHTML="";
+
+    diagnosisOptions.forEach(option=>{
+        const btn=document.createElement("button");
+        btn.textContent=option[1];
+
+        btn.onclick=()=>{
+            selectedDiagnosis=option[0];
+            renderChoices();
+        };
+
+        if(selectedDiagnosis===option[0]){
+            btn.classList.add("selected");
+        }
+
+        diagnosisBox.appendChild(btn);
+    });
+
+    responseOptions.forEach(option=>{
+        const btn=document.createElement("button");
+        btn.textContent=option[1];
+
+        btn.onclick=()=>{
+            selectedResponse=option[0];
+            renderChoices();
+        };
+
+        if(selectedResponse===option[0]){
+            btn.classList.add("selected");
+        }
+
+        responseBox.appendChild(btn);
+    });
+}
+
+function showWrongPopup(){
+    const popup = document.getElementById("wrongPopup");
+
+    popup.style.display = "flex";
+
+    setTimeout(()=>{
+        popup.style.display = "none";
+    },1500);
+}
+
+function submitCase(){
+    if(!selectedDiagnosis || !selectedResponse){
+        playSound("wrongSound");
+        document.getElementById("feedbackText").textContent="Choose both diagnosis and solution.";
+        return;
+    }
+
+    const item=cases[current];
+    attempts++;
+
+    if(selectedDiagnosis===item.diagnosis && selectedResponse===item.response){
+        score+=50;
+        solved++;
+        infection=Math.max(0,infection-4);
+        playSound("correctSound");
+
+        securePc(current);
+        closeModal();
+
+        document.getElementById("feedbackText").textContent=`${item.pc} secured successfully!`;
+        document.getElementById("dialogueText").textContent=`Great! ${item.pc} is secured. I’m moving to the next computer.`;
+
+        current++;
+        updateUI();
+
+        if(current>=cases.length){
+            unlockExit();
+            return;
+        }
+
+        activateNextPc();
+
+        setTimeout(()=>{
+            moveHeroToCurrent();
+        },800);
+
+    }else{
+        wrong++;
+        score=Math.max(0,score-10);
+        infection=Math.min(100,infection+18);
+        playSound("wrongSound");
+        showWrongPopup();
+
+        document.getElementById("feedbackText").textContent="Wrong analysis. Check the visual symptoms again.";
+        document.getElementById("hintBox").textContent="Click Use Hint if you need help.";
+
+        updateUI();
+
+        if(infection>=100){
+            finishGame(false,"Infection reached 100%. The lab was compromised.");
+        }
+    }
+}
+
+function securePc(index){
+    const pc=document.getElementById("pc"+index);
+
+    pc.classList.remove("active","locked");
+    pc.classList.add("solved");
+
+    pc.querySelector(".screen").textContent="✅";
+    pc.querySelector(".pc-status").textContent="SECURED";
+}
+
+function activateNextPc(){
+    for(let i=0;i<cases.length;i++){
+        const pc=document.getElementById("pc"+i);
+
+        if(i===current){
+            pc.classList.remove("locked");
+            pc.classList.add("active");
+            pc.querySelector(".pc-status").textContent="INFECTED";
+        }else{
+            pc.classList.remove("active");
+        }
+
+        const dot=document.getElementById("dot"+i);
+        if(dot){
+            dot.style.opacity=i<=current?"1":".4";
+        }
+    }
+}
+
+function unlockExit(){
+    document.getElementById("feedbackText").textContent="All PCs secured. Exit unlocked!";
+    document.getElementById("dialogueText").textContent="All computers are secured. The lab exit is now open.";
+    document.getElementById("objectiveText").textContent="All PCs secured. Finish Level 3.";
+    document.getElementById("analyzeBtn").disabled=true;
+
+    if(!document.getElementById("finishLevelBtn")){
+        const finishBtn=document.createElement("button");
+        finishBtn.id="finishLevelBtn";
+        finishBtn.className="intro-btn";
+        finishBtn.textContent="Finish Level 3";
+        finishBtn.onclick=completeLevel;
+        document.querySelector(".dialogue").appendChild(finishBtn);
+    }
+}
+
+function useHint(){
+    if(current>=cases.length){
+        document.getElementById("hintBox").textContent="All PCs are secured.";
+        return;
+    }
+
+    document.getElementById("hintBox").textContent=cases[current].hint;
+    hintsUsed++;
+    score=Math.max(0,score-5);
+    updateUI();
+}
+
+function accuracy(){
+    if(attempts===0)return 100;
+    return Math.round((solved/attempts)*100);
+}
+
+function rank(){
+    const currentAccuracy=accuracy();
+
+    if(currentAccuracy>=90 && infection<=20){
+        return "S Rank Malware Analyst";
+    }
+
+    if(currentAccuracy>=75 && infection<=40){
+        return "A Rank Incident Responder";
+    }
+
+    if(currentAccuracy>=60){
+        return "B Rank Cyber Trainee";
+    }
+
+    return "C Rank Needs Practice";
+}
+
+function updateUI(){
+    document.getElementById("score").textContent=score;
+    document.getElementById("progressText").textContent=`${solved}/6`;
+    document.getElementById("progressFill").style.width=`${(solved/6)*100}%`;
+    document.getElementById("accuracyText").textContent=accuracy()+"%";
+    document.getElementById("infectionText").textContent=infection+"%";
+    document.getElementById("infectionBar").style.width=infection+"%";
+
+    const hints=document.getElementById("hintsUsedText");
+    if(hints){
+        hints.textContent=hintsUsed;
+    }
+
+    const rankText=document.getElementById("rankText");
+    if(rankText){
+        rankText.textContent=rank();
+    }
+}
+
+function completeLevel(){
+    if(progressSaved)return;
+
+    progressSaved=true;
+    clearInterval(timerInterval);
+
+    completionTime=Math.floor((Date.now()-startTime)/1000);
+    score+=Math.max(0,timer);
+
+    playSound("completeSound");
+
+    fetch("/save_level3_progress",{
+        method:"POST",
+        headers:{"Content-Type":"application/json"},
+        body:JSON.stringify({
+            score:score,
+            hints_used:hintsUsed,
+            completion_time:completionTime
+        })
+    })
+    .then(response=>response.json())
+    .then(data=>{
+        finishGame(
+            true,
+            data.success
+                ?"Excellent work. You secured all lab computers. Level 4 is now unlocked."
+                :"You completed Level 3, but progress could not be saved."
+        );
+
+        if(data.success && data.coins_earned>0){
+            showCoinPopup(data.coins_earned);
+        }
+    })
+    .catch(()=>{
+        finishGame(true,"You completed Level 3, but progress could not be saved.");
+    });
+}
+
+function finishGame(success,message){
+    gameOver=true;
+    clearInterval(timerInterval);
+
+    if(startTime){
+        completionTime=Math.floor((Date.now()-startTime)/1000);
+    }
+
+    document.getElementById("resultScreen").style.display="flex";
+    document.getElementById("resultTitle").textContent=success?"Diagnosis Lab Complete":"Mission Failed";
+    document.getElementById("resultMessage").textContent=message;
+    document.getElementById("finalScore").textContent=score;
+    document.getElementById("finalAccuracy").textContent=accuracy()+"%";
+    document.getElementById("finalInfection").textContent=infection+"%";
+    document.getElementById("finalTime").textContent=completionTime+"s";
+    document.getElementById("finalRank").textContent=rank();
+}
+
+function restartGame(){
+    location.reload();
+}
+
+function showCoinPopup(coinsEarned){
+    let popup=document.getElementById("coinRewardPopup");
+
+    if(!popup){
+        popup=document.createElement("div");
+        popup.id="coinRewardPopup";
+        popup.innerHTML=`
+        <div style="position:fixed;inset:0;background:rgba(0,0,0,.72);display:flex;align-items:center;justify-content:center;z-index:99999;">
+            <div style="width:430px;background:#071522;border:2px solid #ffd86b;border-radius:26px;padding:35px;text-align:center;color:white;">
+                <div style="font-size:46px;">🪙</div>
+                <h2 style="color:#00ffc8;">Cyber Coins Earned!</h2>
+                <p>You received <strong style="color:#ffd86b;font-size:26px;">${coinsEarned}</strong> Cyber Coins.</p>
+                <button onclick="closeCoinPopup()" style="border:none;border-radius:14px;padding:13px 26px;background:#00ffc8;color:#031014;font-weight:900;">Continue</button>
+            </div>
+        </div>`;
+        document.body.appendChild(popup);
+    }
+
+    popup.style.display="block";
+}
+
+function closeCoinPopup(){
+    const popup=document.getElementById("coinRewardPopup");
+    if(popup){
+        popup.style.display="none";
+    }
+}
+</script>
+{% endblock %}
