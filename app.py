@@ -209,14 +209,6 @@ def get_shop_items():
             "desc": "Unlocks a special neon dashboard style."
         },
         {
-            "key": "gold_certificate_border",
-            "name": "Gold Certificate Border",
-            "cost": 250,
-            "icon": "fa-certificate",
-            "level": "Full Game",
-            "desc": "Adds a premium gold border style to the final certificate."
-        },
-        {
             "key": "champion_title_badge",
             "name": "Champion Title Badge",
             "cost": 300,
